@@ -26,7 +26,14 @@ enableRobotsTXT = true
     noClasses = true
     style = "pygments"
     tabWidth = 4
-
+  
+  [markup.goldmark]
+    [markup.goldmark.extensions]
+      [markup.goldmark.extensions.passthrough]
+        enable = true
+        [markup.goldmark.extensions.passthrough.delimiters]
+          block = [['\[', '\]'], ['$$', '$$']]
+          inline = [['\(', '\)']]
 
 # Generate "Bearblog"-like URLs !only!, see https://bearblog.dev/.
 disableKinds = ["taxonomy"]
@@ -57,3 +64,6 @@ ignoreErrors = ["error-disable-taxonomy"]
   # This theme will, by default, inject a made-with-line at the bottom of the page.
   # You can turn it off, but we would really appreciate if you don’t :-).
   hideMadeWithLine = true
+
+  # For enabling Latex
+  math = true
