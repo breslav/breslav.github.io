@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0" />
+<link rel="shortcut icon" href="https://breslav.github.io/images/favicon-32x32.png" />
+<title>Positional Embeddings are Strange | Mikhail Breslav</title>
+<meta name="title" content="Positional Embeddings are Strange" />
+<meta name="description" content="Recently I&rsquo;ve been reviewing the &ldquo;basics&rdquo; of large language models and decided to finally peek into the details of positional embeddings which I had ignored in the past. In this post I want to share what I&rsquo;ve learned from reviewing this topic.
+Positional Embedding Motivation
+In the foundational Attention Is All You Need paper, positional embeddings are introduced as a way to add ordering information to token embeddings so that the transformer model has some way of understanding the order of the tokens. To state the somewhat obvious, we want language models to understand word order (and by extension token order) because word order impacts the semantics of what is being said." />
+<meta name="keywords" content="" />
+
+
+<meta property="og:url" content="https://breslav.github.io/positional-embeddings-are-strange/">
+  <meta property="og:site_name" content="Mikhail Breslav">
+  <meta property="og:title" content="Positional Embeddings are Strange">
+  <meta property="og:description" content="Recently I’ve been reviewing the “basics” of large language models and decided to finally peek into the details of positional embeddings which I had ignored in the past. In this post I want to share what I’ve learned from reviewing this topic.
+Positional Embedding Motivation In the foundational Attention Is All You Need paper, positional embeddings are introduced as a way to add ordering information to token embeddings so that the transformer model has some way of understanding the order of the tokens. To state the somewhat obvious, we want language models to understand word order (and by extension token order) because word order impacts the semantics of what is being said.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2025-01-28T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-01-28T00:00:00+00:00">
+    <meta property="og:image" content="https://breslav.github.io/images/share.png">
+
+
+
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://breslav.github.io/images/share.png">
+  <meta name="twitter:title" content="Positional Embeddings are Strange">
+  <meta name="twitter:description" content="Recently I’ve been reviewing the “basics” of large language models and decided to finally peek into the details of positional embeddings which I had ignored in the past. In this post I want to share what I’ve learned from reviewing this topic.
+Positional Embedding Motivation In the foundational Attention Is All You Need paper, positional embeddings are introduced as a way to add ordering information to token embeddings so that the transformer model has some way of understanding the order of the tokens. To state the somewhat obvious, we want language models to understand word order (and by extension token order) because word order impacts the semantics of what is being said.">
+
+
+
+
+  <meta itemprop="name" content="Positional Embeddings are Strange">
+  <meta itemprop="description" content="Recently I’ve been reviewing the “basics” of large language models and decided to finally peek into the details of positional embeddings which I had ignored in the past. In this post I want to share what I’ve learned from reviewing this topic.
+Positional Embedding Motivation In the foundational Attention Is All You Need paper, positional embeddings are introduced as a way to add ordering information to token embeddings so that the transformer model has some way of understanding the order of the tokens. To state the somewhat obvious, we want language models to understand word order (and by extension token order) because word order impacts the semantics of what is being said.">
+  <meta itemprop="datePublished" content="2025-01-28T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2025-01-28T00:00:00+00:00">
+  <meta itemprop="wordCount" content="1459">
+  <meta itemprop="image" content="https://breslav.github.io/images/share.png">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  body {
+    font-family: Verdana, sans-serif;
+    margin: auto;
+    padding: 20px;
+    max-width: 720px;
+    text-align: left;
+    background-color: white;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: #444;
+  }
+
+  figure {
+    float: left;
+    margin-top: 0.2cm;
+    margin-left: auto;
+    margin-right: 0.5cm;
+  }
+
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  b {
+    color: #222;
+  }
+
+  a {
+    color: #3273dc;
+  }
+
+  .title {
+    text-decoration: none;
+    border: 0;
+  }
+
+  .title span {
+    font-weight: 400;
+  }
+
+  nav a {
+    margin-right: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+
+  content {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    padding: 2px 5px;
+    background-color: #eee;
+  }
+
+  pre code {
+    border-left: 1px solid #999;
+    color: #555;
+    display: block;
+    padding: 10px;
+    white-space: pre-wrap;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: #555;
+    padding-left: 10px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px;
+    text-align: center;
+  }
+
+  .helptext {
+    color: #777;
+    font-size: small;
+  }
+
+  .errorlist {
+    color: #eba613;
+    font-size: small;
+  }
+
+  h4 {
+    margin-bottom: -0.25cm;
+}
+</style>
+
+
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],  
+      inlineMath: [['\\(', '\\)']]                  
+    }
+  };
+</script>
+  
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>Mikhail Breslav</h2>
+</a>
+<nav><a href="/">Home</a>
+
+<a href="/cv/">CV</a>
+
+<a href="/blog">Blog</a>
+</nav>
+</header>
+  <main>
+
+<h1>Positional Embeddings are Strange</h1>
+<p>
+  <i>
+    <time datetime='2025-01-28' pubdate>
+      28 Jan, 2025
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>Recently I&rsquo;ve been reviewing the &ldquo;basics&rdquo; of large language models and decided to finally peek into the details of positional embeddings which I had ignored in the past. In this post I want to share what I&rsquo;ve learned from reviewing this topic.</p>
+<h4 id="positional-embedding-motivation">Positional Embedding Motivation</h4>
+<p>In the foundational <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Attention Is All You Need</a> paper, positional embeddings are introduced as a way to add ordering information to token embeddings so that the transformer model has some way of understanding the order of the tokens. To state the somewhat obvious, we want language models to understand word order (and by extension token order) because word order impacts the semantics of what is being said.</p>
+<p>A question arises:</p>
+<blockquote>
+<p>Why does the transformer model needs some additional mechanism to understand the order of words, aren&rsquo;t we already feeding the words in to the model in an ordered way?</p>
+</blockquote>
+<p>The reason is that the transformer architecture is based on self-attention which produces the same set of output vectors regardless of input order. Conceptually, if you are producing the same set of vectors for different word orderings then how can you differentiate between the different meanings (or lack of meaning) represented by different permutations of a sentence. So in short the self-attention mechanism is why transformers need some way of encoding the order of input tokens.</p>
+<h4 id="sinusoidal-positional-embeddings">Sinusoidal Positional Embeddings</h4>
+<p>In the foundational paper mentioned above, the authors encode the absolute position of a token by constructing a \(d\) dimensional vector composed of a series of sine and cosine waves of varying frequencies. The sine or cosine waves used for some dimension \(i\) will have an angular frequency value that also depends on \(i\). The absolute position of the token in the input sequence is then used to evaluate the sinusoid at a specific point in time leading to a concrete value for that dimension.</p>
+<p>To lessen my confusion I took to Google and found several helpful blogs and videos which I will link <a href="#references">below</a>. There were a few concepts that I found interesting and helpful in gaining at least some intuition for these sinusoidal embeddings and I wanted to put them in my own words here.</p>
+<ul>
+<li>
+<p>The first concept comes from a thought experiment where we consider representing the position in binary. As an example, the 8th position or number 8 is represented in binary as 1000, or 01000 if using more bits. Since we can add an arbitrary number of 0&rsquo;s to the more significant bits we have found a way to encode a position into \(d\) binary values or equivalently a \(d\) dimensional vector. Additionally, if we consider neighboring positions, e.g counting up from 0 to 1 to 2 and so forth, we will notice that the least significant bit will flip between 0 and 1 with the highest frequency and as we go to more significant bits they flip with less frequency.</p>
+</li>
+<li>
+<p>If we now look at binary as encoding a number with a collection of square waves of differening frequencies, then it becomes much easier to interpret sinusoidal embeddings as being very similar but with sinusoids (smooth and continuous) instead of square waves.</p>
+</li>
+<li>
+<p>The second concept I picked up is the idea that it would helpful if positional embeddings also encoded something about relative distances (not just absolute positions). It turns out that by using sine and cosine to encode position you get the property that the encodings of different positions are related to each other through rotations. This then implies that if you have two positional embeddings and you examine the rotation between them you can say something about the relative distance between the positions they encode. Yet the embeddings themselves encode absolute positions.</p>
+</li>
+<li>
+<p>The third concept which I don&rsquo;t really follow is the notion that it is beneficial to have different frequencies represented in different dimensions of the embedding vector as it somehow helps the model handle shorter range and longer range dependencies between tokens. The best explanation I&rsquo;ve put together so far is that using different frequencies is just how the math works out, similar to how representing numbers in binary can be thought of as using square waves of various frequencies.</p>
+</li>
+</ul>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<h4 id="rotary-position-embedding-rope">Rotary Position Embedding (RoPE)</h4>
+<p>Since the Attention Is All You Need paper is 8 years old as of this writing, I also wanted to get a sense of what state of the art looks like for encoding position. This led me to a popular paper published in 2023 titled <a href="https://arxiv.org/pdf/2104.09864v5" target="_blank" rel="noopener">Rotary Position Embeddings (RoPE)</a>. RoPE has been used in models like LLama 3 from Meta.</p>
+<p>RoPE&rsquo;s approach to positional embeddings is derived from the objective of finding a function \(f\), that produces a dot product with a specific property. Specifically, if we have a word embedding vector \(x\) representing a token at position \(n\), and we have a word embedding vector \(y\) representing a token at position \(m\), then we would like their dot product to only depend on \(x\), \(y\) and their relative position \(m-n\).</p>
+<p>The paper shows that when \(f\) is chosen to be a rotation matrix the dot product satisfies the desired objective. To apply \(f\) to a \(d\) dimensional word embedding you would in theory construct a \(d \times d\) block diagonal rotation matrix, where the amount of rotation changes every 2 dimensions. In practice applying \(f\) is efficient because the matrix is very sparse and thus a full matrix multiply is not needed.</p>
+<p>As before, there were several <a href="#references">references</a> that helped me better understand what RoPE is doing and here are my main takeaways.</p>
+<ul>
+<li>
+<p>The main concept behind RoPE is that rotation provides a way of encoding relative positional information between vectors being dot producted. Again this property falls out from the underlying math. Essentially we have a dot product of two vectors that have a rotation applied to them, something like \(R_1x \cdot R_2y => x^{T}R_1^{T} R_2y\) which leads to \(x^{T}R_1^{-1}R_2y\) which involves a rotation that only depends on the <em>relative</em> difference between rotations.</p>
+</li>
+<li>
+<p>Another concept has to do with motivating why encoding relative positions is valuable. Consider the phrase &ldquo;blue dog&rdquo;, where &ldquo;blue&rdquo; has position 1, and &ldquo;dog&rdquo; has position 2. Using RoPE we would apply some rotation (say 10 degrees) to the vector representing &ldquo;blue&rdquo; and some other rotation to &ldquo;dog&rdquo; (say 20 degrees) (assume 2D vector for simplicity). Then suppose the phrase has changed to &ldquo;we painted a blue dog&rdquo;, now &ldquo;blue&rdquo; is in position 4 (say this corresponds to a 40 degree rotation) and &ldquo;dog&rdquo; is in position 5 (a 50 degree rotation). Since the dot product only depends on the difference in rotation and thus relative token positions, we have the nice property that the dot product of a key associated with &ldquo;blue&rdquo; and a query associated with &ldquo;dog&rdquo; will not have changed because their relative rotations (20-10 = 50-40) remained the same. If on the other hand we had used absolute embeddings then the dot product would have changed.</p>
+</li>
+</ul>
+<h4 id="conclusion">Conclusion</h4>
+<p>My main takeaway is that researchers have identified interesting mathematical tricks that fufill the goal of allowing LLMs to understand the position of tokens (with a particular emphasis on <em>relative</em> position). Like much of the field of ML, the success of an approach is primarily driven by how well it works in practice. Questions like &ldquo;why does this work so well?&rdquo; and &ldquo;does this really make sense?&rdquo; often require additional research. As an example there is <a href="https://arxiv.org/pdf/2410.06205" target="_blank" rel="noopener">this paper</a> that re-examines RoPE.</p>
+<p>This post serves as my non-comprehensive partial understanding of this space and there are still many aspects <a href="#lingering-questions">I don&rsquo;t fully understand</a>.
+In the interest of time, I&rsquo;m moving on to reviewing the core attention mechanism of the transformer, but I think it&rsquo;s fair to say that positional embeddings are kind of strange.</p>
+<p>If you made it this far, thanks and check out the The Door&rsquo;s song <a href="https://en.wikipedia.org/wiki/People_Are_Strange" target="_blank" rel="noopener">People Are Strange</a> which partly inspired the title of this post.</p>
+<h4 id="lingering-questions">Lingering Questions</h4>
+<p>Some questions that came to mind during my research:</p>
+<ul>
+<li>If you add positional embeddings to word embeddings how do you expect the model to separate the two signals back out?</li>
+<li>Is it some strange coincidence that sinusoids are at the heart of both of these papers/techniques? Is it just that they are a great way to encode values?</li>
+<li>Why exactly do we want frequency/angles of sinusoids to vary as a function of dimension?</li>
+</ul>
+<h4 id="references">References</h4>
+<p>These are the references I found to be helpful:</p>
+<ul>
+<li><a href="https://huggingface.co/blog/designing-positional-encoding" target="_blank" rel="noopener">Hugging Face Blog</a> provides a way to view different encodings as a natural progression.</li>
+<li><a href="https://blog.eleuther.ai/rotary-embeddings/" target="_blank" rel="noopener">Eleuther AI Blog</a> focuses on rotary embeddings.</li>
+<li><a href="https://kazemnejad.com/blog/transformer_architecture_positional_encoding/" target="_blank" rel="noopener">Amirhossein&rsquo;s Blog</a> focuses on explaining the use of sinusoidal functions.</li>
+<li><a href="https://www.youtube.com/watch?v=SMBkImDWOyQ" target="_blank" rel="noopener">Jia-Bin Huang&rsquo;s YT Video</a> has nice visuals related to RoPE.</li>
+<li><a href="https://www.youtube.com/watch?v=o29P0Kpobz0" target="_blank" rel="noopener">Efficient NLP YT Video</a> another video with nice visuals on RoPE.</li>
+<li><a href="https://arxiv.org/pdf/2104.09864v5" target="_blank" rel="noopener">RoPE Paper</a></li>
+<li><a href="https://arxiv.org/pdf/2410.06205" target="_blank" rel="noopener">Paper Re-examining Rope</a> more recent analysis of RoPE.</li>
+</ul>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+
+</content>
+<p>
+  
+</p>
+
+  </main>
+  <footer><small>
+  Copyright &copy; 2025 Mikhail Breslav 
+</small></footer>
+
+    
+</body>
+
+</html>
