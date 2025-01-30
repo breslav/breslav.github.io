@@ -12,6 +12,9 @@ languageCode = "en-US"
 
 # Generate a nice robots.txt for SEO
 enableRobotsTXT = true
+[services]
+  [services.googleAnalytics]
+    id = 'G-ND7MED44L2'
 
 [markup]
   [markup.highlight]
