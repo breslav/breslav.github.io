@@ -7,8 +7,15 @@
     <generator>Hugo</generator>
     <language>en-US</language>
     <copyright>Copyright © 2025, Mikhail Breslav.....</copyright>
-    <lastBuildDate>Tue, 28 Jan 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 07 Feb 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://breslav.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Brief Notes on Attention Efficiency</title>
+      <link>https://breslav.github.io/brief-notes-on-attention-efficiency/</link>
+      <pubDate>Fri, 07 Feb 2025 00:00:00 +0000</pubDate>
+      <guid>https://breslav.github.io/brief-notes-on-attention-efficiency/</guid>
+      <description>&lt;p&gt;As part of my ongoing review of LLMs, I revisited the core computation performed during self attention. Like in my previous reviews, I focused on the&#xA;idea of there being three important learnable projections that map our token embeddings to queries, keys, and values which are then used to re-represent (add context to) the token embeddings. One aspect of attention that I glossed over in the past is the efficiency of this computation.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Positional Embeddings are Strange</title>
       <link>https://breslav.github.io/positional-embeddings-are-strange/</link>
