@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0" />
+<link rel="shortcut icon" href="https://breslav.github.io/images/favicon-32x32.png" />
+<title>Brief Notes on Attention Efficiency | Mikhail Breslav</title>
+<meta name="title" content="Brief Notes on Attention Efficiency" />
+<meta name="description" content="As part of my ongoing review of LLMs, I revisited the core computation performed during self attention. Like in my previous reviews, I focused on the
+idea of there being three important learnable projections that map our token embeddings to queries, keys, and values which are then used to re-represent (add context to) the token embeddings. One aspect of attention that I glossed over in the past is the efficiency of this computation." />
+<meta name="keywords" content="" />
+
+
+<meta property="og:url" content="https://breslav.github.io/brief-notes-on-attention-efficiency/">
+  <meta property="og:site_name" content="Mikhail Breslav">
+  <meta property="og:title" content="Brief Notes on Attention Efficiency">
+  <meta property="og:description" content="As part of my ongoing review of LLMs, I revisited the core computation performed during self attention. Like in my previous reviews, I focused on the idea of there being three important learnable projections that map our token embeddings to queries, keys, and values which are then used to re-represent (add context to) the token embeddings. One aspect of attention that I glossed over in the past is the efficiency of this computation.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2025-02-07T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-02-07T00:00:00+00:00">
+    <meta property="og:image" content="https://breslav.github.io/images/share.png">
+
+
+
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://breslav.github.io/images/share.png">
+  <meta name="twitter:title" content="Brief Notes on Attention Efficiency">
+  <meta name="twitter:description" content="As part of my ongoing review of LLMs, I revisited the core computation performed during self attention. Like in my previous reviews, I focused on the idea of there being three important learnable projections that map our token embeddings to queries, keys, and values which are then used to re-represent (add context to) the token embeddings. One aspect of attention that I glossed over in the past is the efficiency of this computation.">
+
+
+
+
+  <meta itemprop="name" content="Brief Notes on Attention Efficiency">
+  <meta itemprop="description" content="As part of my ongoing review of LLMs, I revisited the core computation performed during self attention. Like in my previous reviews, I focused on the idea of there being three important learnable projections that map our token embeddings to queries, keys, and values which are then used to re-represent (add context to) the token embeddings. One aspect of attention that I glossed over in the past is the efficiency of this computation.">
+  <meta itemprop="datePublished" content="2025-02-07T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2025-02-07T00:00:00+00:00">
+  <meta itemprop="wordCount" content="668">
+  <meta itemprop="image" content="https://breslav.github.io/images/share.png">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  body {
+    font-family: Verdana, sans-serif;
+    margin: auto;
+    padding: 20px;
+    max-width: 720px;
+    text-align: left;
+    background-color: white;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: #444;
+  }
+
+  figure {
+    float: left;
+    margin-top: 0.2cm;
+    margin-left: auto;
+    margin-right: 0.5cm;
+  }
+
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  b {
+    color: #222;
+  }
+
+  a {
+    color: #3273dc;
+  }
+
+  .title {
+    text-decoration: none;
+    border: 0;
+  }
+
+  .title span {
+    font-weight: 400;
+  }
+
+  nav a {
+    margin-right: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+
+  content {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    padding: 2px 5px;
+    background-color: #eee;
+  }
+
+  pre code {
+    border-left: 1px solid #999;
+    color: #555;
+    display: block;
+    padding: 10px;
+    white-space: pre-wrap;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: #555;
+    padding-left: 10px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px;
+    text-align: center;
+  }
+
+  .helptext {
+    color: #777;
+    font-size: small;
+  }
+
+  .errorlist {
+    color: #eba613;
+    font-size: small;
+  }
+
+  h4 {
+    margin-bottom: -0.25cm;
+}
+</style>
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-ND7MED44L2"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-ND7MED44L2');
+        }
+      </script>
+
+  
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],  
+      inlineMath: [['\\(', '\\)']]                  
+    }
+  };
+</script>
+  
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>Mikhail Breslav</h2>
+</a>
+<nav><a href="/">Home</a>
+
+<a href="/cv/">CV</a>
+
+<a href="/blog">Blog</a>
+</nav>
+</header>
+  <main>
+
+<h1>Brief Notes on Attention Efficiency</h1>
+<p>
+  <i>
+    <time datetime='2025-02-07' pubdate>
+      07 Feb, 2025
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>As part of my ongoing review of LLMs, I revisited the core computation performed during self attention. Like in my previous reviews, I focused on the
+idea of there being three important learnable projections that map our token embeddings to queries, keys, and values which are then used to re-represent (add context to) the token embeddings. One aspect of attention that I glossed over in the past is the efficiency of this computation.</p>
+<!-- raw HTML omitted -->
+<h3 id="how-efficient-is-self-attention">How Efficient is Self Attention?</h3>
+<p>Looking at the <a href="#references">Multi-Query Attention</a> paper we can see that they report multi-headed attention as having a time complexity of \(\Theta(bnd^{2})\) and a memory complexity of \(O(bnd + bhn^{2} + d^{2})\). Our goal in this section is to see if this makes sense at a high level.</p>
+<p>Let&rsquo;s start by reviewing the time complexity component and I&rsquo;ll make a few simplifying assumptions:</p>
+<ul>
+<li>Assume the Q,K,V projection tensors map our \(d\) dimensional embedding vectors into \(k\) dimensions where \(k = d/h\). Here \(h\) is the number of attention heads.</li>
+</ul>
+<!-- raw HTML omitted -->
+<p>Therefore:</p>
+<ul>
+<li>We apply three projections (for each of \(h\) attention heads) to our (batched) input which has shape \([b,n,d]\). This results in applying \(bh\) projections of size \(d\,x\,k\) for each of \(n\) tokens. So \(dk\) multiplications for a single token and \(bhndk\) for all tokens, across all attention heads and all batches. Given our assumption this becomes \(bhndd/h\) which simplifies to \(bnd^{2}\).</li>
+<li>Next we need to multiply the queries and keys together, put each row through a softmax which we ignore for now, and then multiply the attention weights by the values. So \([b,h,n,k]\) multiplied by \([b,h,n,k]\) involves \(bhkn^{2}\) multiplications and \([b,h,n,n]\) multiplied by \([b,h,n,k]\) also involves \(bhkn^{2}\) multiplications. This is equivalent to \(bhn^{2}d/h = bdn^{2}\).</li>
+<li>Now summing these two terms yields \(bnd^{2} + bdn^{2}\).</li>
+</ul>
+<!-- raw HTML omitted -->
+<p>At this point we see a discrepency between my analysis and what the paper reports. The paper only contains the first term and ignores the second. Why might this be? My guess is that the paper assumes \(d >> n\) in which case the first term dominates and the second term can be ignored. While at the time of the paper that may have been a good assumption it&rsquo;s not obvious that it still holds as context lengths have grown larger and larger.</p>
+<p>Another confusion I&rsquo;ve had is seeing the complexity of attention commonly being reported as quadratic in \(n\), while my computation above shows that we also have the first term which is quadratic in \(d\). This confusion was resolved when I realized that the commonly reported complexity is only considering the computation of the attention weights and applying them to the values. Instead my starting point was based on the above paper which also includes the projection steps in its computation. So while the attention computation is quadratic in \(n\) we must also consider the pre step of calculating the Queries, Keys, and Values which is qudratic in \(d\).</p>
+<p>As for memory complexity, it&rsquo;s easier to see where it comes from by looking at the paper directly and noting the shapes of all the tensors that need to be stored during the computation. Like time complexity we see that memory is also quadratic in \(n\) and \(d\).</p>
+<h4 id="conclusion--lingering-questions">Conclusion &amp; Lingering Questions</h4>
+<p>Given that we want LLMs to be able to handle long input sequences it is reasonable to be concerned by the overall quadratic dependence on sequence length. This leads to a few of my lingering questions&hellip;</p>
+<ul>
+<li>What are some of the key methods that have been developed to improve the effiency of self attention? While I&rsquo;ve stumbled upon some works (e.g Flash Attention), I haven&rsquo;t explored the subject much.</li>
+<li>Are these advancements in attention efficiency the primary enabler of long context windows? I also assume that <a href="https://breslav.github.io/positional-embeddings-are-strange/">relative positional embeddings</a> play a helping role here.</li>
+</ul>
+<p>As usual if you&rsquo;ve made it this far thanks for the read. If you&rsquo;re looking for some calming music check out the <a href="https://open.spotify.com/playlist/37i9dQZF1DWZqd5JICZI0u?si=d4272fc6cb434d24" target="_blank" rel="noopener">Peaceful Meditation playlist</a> on Spotify.</p>
+<!-- raw HTML omitted -->
+<h4 id="references">References</h4>
+<p>These are the references I found to be helpful:</p>
+<ul>
+<li><a href="https://arxiv.org/pdf/1911.02150" target="_blank" rel="noopener">Multi-Query Attention Paper</a></li>
+</ul>
+
+</content>
+<p>
+  
+</p>
+
+  </main>
+  <footer><small>
+  Copyright &copy; 2025 Mikhail Breslav 
+</small></footer>
+
+    
+</body>
+
+</html>
