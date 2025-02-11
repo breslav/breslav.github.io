@@ -3,10 +3,13 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://breslav.github.io/</loc>
-    <lastmod>2025-01-28T00:00:00+00:00</lastmod>
+    <lastmod>2025-02-07T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://breslav.github.io/blog/</loc>
-    <lastmod>2025-01-28T00:00:00+00:00</lastmod>
+    <lastmod>2025-02-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://breslav.github.io/brief-notes-on-attention-efficiency/</loc>
+    <lastmod>2025-02-07T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://breslav.github.io/positional-embeddings-are-strange/</loc>
     <lastmod>2025-01-28T00:00:00+00:00</lastmod>
