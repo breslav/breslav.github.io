@@ -1,12 +1,12 @@
 ---
 date: "2025-02-20T00:00:00Z"
 tags:
-title: Catching Up On Vision (Round 2)
+title: Oops, Contrastive Representation Learning 
 ---
 
-The next paper I wanted to look at from the vision + transformers space was [DINO](https://arxiv.org/pdf/2104.14294). I quickly realized that I would need to recurse into background papers in order to make sense of DINO. In this post I will connect the dots and build up to understanding DINO.
+Originally I wanted to focus this blog post on a vision + transformer paper known as [DINO](https://arxiv.org/pdf/2104.14294). I quickly realized that I would need to recurse into background reading before I could understand DINO. So instead this post will be about contrastive representation learning and several other papers which will help with understanding DINO. Hence the title beginning with Oops.
 
-We'll begin by reviewing contrastive representation learning which will set the stage for the papers discussed in this post.
+We'll begin by reviewing contrastive representation learning which will set the stage for a few important papers.
 
 #### Contrastive Representation Learning
 There is this broad concept that if we have a bunch of data points (e.g images) we would like to be able to learn a good representation of them. One way to set this up as a learning problem is to encourage similar data points to be closer together in the representation space and unlike data points to be farther appart. 
@@ -15,7 +15,8 @@ One place where I had seen this broad concept was in the [Locality-Sensitive Has
 
 Another work I encountered in the past was [FaceNet](https://arxiv.org/pdf/1503.03832) where they learn representations of faces by encouraging faces from the same person to be closer in representation space than faces from two different people. They introduce a triplet loss, illustrated below, which encodes this objective.  
 
-![Triplet Loss Illustration](/images/triplet_loss_graphic.png)
+{{< imgproc triplet_loss_graphic Resize "600x" "Triplet Loss" >}} Illustration of the Triplet Loss (from the paper). {{< /imgproc >}}
+
 
 The triplet loss says that some person's face (represented by an anchor) should be closer in representation to some other photo of their face (represented by the positive sample) than to some photo of someone elses face (represented by a negative sample). This is a triplet loss because the loss requires three representations (anchor, positive, negative) to be computed. You'll also notice in the paper that there is a hyperparameter \(\alpha\) which is used to set a margin, meaning the distance between anchor and negative must be at least \(\alpha\) more than the distance between anchor and positive. The representation is also constrained to have a magnitude of \(1\).
 
@@ -25,7 +26,8 @@ We can think of this triplet loss as an example of *supervised* contrastive repr
 SimCLR proposes a framework to apply contrastive learning to images without the need for labels and hence it is a self-supervised approach. In general I would expect self-supervision to outperform supervision because it enables using a lot more data and the signal for training is not limited to labels which could be relatively shallow (e.g describing a rich image with a single label).
 
 In the image below we see the main idea behind self-supervised contrastive learning.
-![SimCLR Framework](/images/simclr.png)
+{{< imgproc simclr Resize "500x" "SimCLR Architecture" >}} Main Architecture of SimCLR (from the paper). {{< /imgproc >}}
+
 - First we take an image \(x\) and apply two different random transformations (image augmentations) to them (e.g cropping, blurring, color distortion).
 - Then you feed the two different augmentations through some encoder \(f\) (often chosen to be ResNet) which produces a representation \(h\).
 - You then feed the representation through a small neural network (\(g\)), referred to as a projection head, which produces a vector \(z\). 
@@ -55,7 +57,7 @@ The way BYOL works is depicted in the figure below and it involves the following
   - The target network weights are taken as an exponential moving average. In other words the target network weights are updated to be a combination of itself and the latest online weights.
 - Lastly, after training most of the architecture is thrown away. The only part that is kept is the now trained ResNet which hopefully has learned to produce a "good" image representation.
  
-![BYOL Architecture](/images/byol.png)
+{{< imgproc byol Resize "800x" "BYOL Architecture" >}} Main Architecture of BYOL (from the paper). {{< /imgproc >}}
 
 My high level understanding of this model is that like SimCLR it learns that different augmentations of an image don't change the underlying meaning of the image. If we learn a good representation for the original dog image then we would expect the two augmentations to be related by a relatively simple function (represented by \(q_{\theta}\)).
 
@@ -67,18 +69,15 @@ This leads to the mystery of this paper which is how the model prevents the netw
 
 What I also found a bit challenging to wrap my head around initially is that there are two networks with different parameters but one kind of tracks the other. However after reading SimCLR, which I originally read after BYOL, it isn't as weird since SimCLR can be thought of as using the same network twice with the same parameters, this is more of a tweak on that.
 
-For this paper I once again recommend the commentary from [Yannic Kilcher's](#references) YT Video which helpded my understanding of the paper. 
+For this paper I once again recommend the commentary from [Yannic Kilcher's](#references) YT Video which helped my understanding of the paper. 
 
-#### DINO
+#### Conclusion
+Writing this blog post was pretty helpful for me because I hadn't been exposed to self-supervised representation learning in the vision domain. Stay tuned for my post on DINO! 
 
-
-
-
-#### Conclusion & Lingering Questions
 
 #### References
+- [SimCLR](https://arxiv.org/pdf/2002.05709)
 - [Bootstrap Your Own Latent (BYOL)](https://arxiv.org/pdf/2006.07733)
-- [DINO](https://arxiv.org/pdf/2104.14294)
-- [Yannic Kilcher's YouTube Video](https://www.youtube.com/watch?v=YPfUiOMYOEE)
+- [BYOL YT Video](https://www.youtube.com/watch?v=YPfUiOMYOEE) Another helpful video from Yannic Kilcher's YT page.
 
 
