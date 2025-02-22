@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0" />
+<link rel="shortcut icon" href="https://breslav.github.io/images/favicon-32x32.png" />
+<title>Vision Meets Transformers | Mikhail Breslav</title>
+<meta name="title" content="Vision Meets Transformers" />
+<meta name="description" content="When I began my PhD in computer vision the leading approaches of the day were models like support vector machines, probabilistic graphical models, and decision trees. Fast-forward to 2016 when I was graduating and the deep learning revolution was underway. Leading approaches were convolutional neural networks like AlexNet, VGG, and ResNet.
+I had the fortune to play with CNNs for the final project of my PhD.  Specifically, I experimented with finetuning a VGG-16 CNN on a very small dataset for the task of pose estimation. The results weren&rsquo;t very good which I think was due to a combination of having a very limited training set and targeting a domain too different from the source domain. I was working with grayscale images of moths captured in a laboratory which looked nothing like the ImageNet images used to train the base model." />
+<meta name="keywords" content="" />
+
+
+<meta property="og:url" content="https://breslav.github.io/vision-meets-transformers/">
+  <meta property="og:site_name" content="Mikhail Breslav">
+  <meta property="og:title" content="Vision Meets Transformers">
+  <meta property="og:description" content="When I began my PhD in computer vision the leading approaches of the day were models like support vector machines, probabilistic graphical models, and decision trees. Fast-forward to 2016 when I was graduating and the deep learning revolution was underway. Leading approaches were convolutional neural networks like AlexNet, VGG, and ResNet.
+I had the fortune to play with CNNs for the final project of my PhD. Specifically, I experimented with finetuning a VGG-16 CNN on a very small dataset for the task of pose estimation. The results weren’t very good which I think was due to a combination of having a very limited training set and targeting a domain too different from the source domain. I was working with grayscale images of moths captured in a laboratory which looked nothing like the ImageNet images used to train the base model.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2025-02-18T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-02-18T00:00:00+00:00">
+    <meta property="og:image" content="https://breslav.github.io/images/share.png">
+
+
+
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://breslav.github.io/images/share.png">
+  <meta name="twitter:title" content="Vision Meets Transformers">
+  <meta name="twitter:description" content="When I began my PhD in computer vision the leading approaches of the day were models like support vector machines, probabilistic graphical models, and decision trees. Fast-forward to 2016 when I was graduating and the deep learning revolution was underway. Leading approaches were convolutional neural networks like AlexNet, VGG, and ResNet.
+I had the fortune to play with CNNs for the final project of my PhD. Specifically, I experimented with finetuning a VGG-16 CNN on a very small dataset for the task of pose estimation. The results weren’t very good which I think was due to a combination of having a very limited training set and targeting a domain too different from the source domain. I was working with grayscale images of moths captured in a laboratory which looked nothing like the ImageNet images used to train the base model.">
+
+
+
+
+  <meta itemprop="name" content="Vision Meets Transformers">
+  <meta itemprop="description" content="When I began my PhD in computer vision the leading approaches of the day were models like support vector machines, probabilistic graphical models, and decision trees. Fast-forward to 2016 when I was graduating and the deep learning revolution was underway. Leading approaches were convolutional neural networks like AlexNet, VGG, and ResNet.
+I had the fortune to play with CNNs for the final project of my PhD. Specifically, I experimented with finetuning a VGG-16 CNN on a very small dataset for the task of pose estimation. The results weren’t very good which I think was due to a combination of having a very limited training set and targeting a domain too different from the source domain. I was working with grayscale images of moths captured in a laboratory which looked nothing like the ImageNet images used to train the base model.">
+  <meta itemprop="datePublished" content="2025-02-18T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2025-02-18T00:00:00+00:00">
+  <meta itemprop="wordCount" content="1265">
+  <meta itemprop="image" content="https://breslav.github.io/images/share.png">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  body {
+    font-family: Verdana, sans-serif;
+    margin: auto;
+    padding: 20px;
+    max-width: 720px;
+    text-align: left;
+    background-color: white;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: #444;
+  }
+
+  figure {
+    float: left;
+    margin-top: 0.2cm;
+    margin-left: auto;
+    margin-right: 0.5cm;
+  }
+
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  b {
+    color: #222;
+  }
+
+  a {
+    color: #3273dc;
+  }
+
+  .title {
+    text-decoration: none;
+    border: 0;
+  }
+
+  .title span {
+    font-weight: 400;
+  }
+
+  nav a {
+    margin-right: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+
+  content {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    padding: 2px 5px;
+    background-color: #eee;
+  }
+
+  pre code {
+    border-left: 1px solid #999;
+    color: #555;
+    display: block;
+    padding: 10px;
+    white-space: pre-wrap;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: #555;
+    padding-left: 10px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px;
+    text-align: center;
+  }
+
+  .helptext {
+    color: #777;
+    font-size: small;
+  }
+
+  .errorlist {
+    color: #eba613;
+    font-size: small;
+  }
+
+  h4 {
+    margin-bottom: -0.25cm;
+}
+</style>
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-ND7MED44L2"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-ND7MED44L2');
+        }
+      </script>
+
+  
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],  
+      inlineMath: [['\\(', '\\)']]                  
+    }
+  };
+</script>
+  
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>Mikhail Breslav</h2>
+</a>
+<nav><a href="/">Home</a>
+
+<a href="/cv/">CV</a>
+
+<a href="/blog">Blog</a>
+</nav>
+</header>
+  <main>
+
+<h1>Vision Meets Transformers</h1>
+<p>
+  <i>
+    <time datetime='2025-02-18' pubdate>
+      18 Feb, 2025
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>When I began my PhD in computer vision the leading approaches of the day were models like support vector machines, probabilistic graphical models, and decision trees. Fast-forward to 2016 when I was graduating and the deep learning revolution was underway. Leading approaches were convolutional neural networks like <a href="https://proceedings.neurips.cc/paper_files/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf" target="_blank" rel="noopener">AlexNet</a>, <a href="https://arxiv.org/pdf/1409.1556" target="_blank" rel="noopener">VGG</a>, and <a href="https://arxiv.org/pdf/1512.03385" target="_blank" rel="noopener">ResNet</a>.</p>
+<p>I had the fortune to play with CNNs for the final project of my PhD.  Specifically, I experimented with finetuning a VGG-16 CNN on a very small dataset for the task of pose estimation. The <a href="https://arxiv.org/pdf/2010.11929" target="_blank" rel="noopener">results</a> weren&rsquo;t very good which I think was due to a combination of having a very limited training set and targeting a domain too different from the source domain. I was working with grayscale images of moths captured in a laboratory which looked nothing like the <a href="https://www.image-net.org" target="_blank" rel="noopener">ImageNet</a> images used to train the base model.</p>
+<p>Since graduating and entering industry my career moved away from computer vision and so I stopped attending (LLM pun intended) to where the field was headed.</p>
+<p>In this blog post I briefly review a <em>few</em> papers that seem important for understanding the field of computer vision as it is <em>today</em>. A motivating question for finding these papers is asking how have transformers been used for vision problems?</p>
+<h4 id="vision-transformer">Vision Transformer</h4>
+<p>In research it&rsquo;s very common to look at successful approaches in one area and try them out in another. So it&rsquo;s no surprise that following the success of transformers in NLP some Google researchers published a <a href="https://arxiv.org/pdf/2010.11929" target="_blank" rel="noopener">paper</a> applying the transformer to the task of image classification. The paper showed that a transformer could outperform CNNs on image classification tasks while using less compute.</p>
+<p>Zooming in a little, we see that in order to apply a transformer to an image we need some way to turn it into a sequence of vectors. The approach taken in this paper is to slice up an image into small patches (e.g \(16\times16\) pixels.), flatten each patch, and then order them from top to bottom and left to right. Then a learned linear projection is applied to each image patch to produce embeddings. Positional embeddings, which are learned, are added to the input (image) embeddings. The resulting vectors are fed into a transformer encoder.</p>
+<p>In order to perform classification a classification head was added to the transformer encoder along with a classification token (learnable embedding) at position 0. During training, large labeled image datasets (like ImageNet and successors) were used with a standard classification loss to train the model (in contrast to pre-training with self-supervision). The authors report that when fine-tuning for specific tasks the pre-trained prediction head is replaced by a zero initialized feed forward layer. The overall architecture is shown in the figure below.</p>
+
+
+
+
+
+
+
+
+<figure style="padding: 0.25rem; margin: 0.25rem 0; background-color: #ffffff; float: none; display: block;text-align: center;">
+	<img style="width: auto; height: auto; float: none; display: block; margin-left: auto; margin-right: auto;text-align: center;" src="/vision-meets-transformers/vit_hu17081909414311145272.png" width="800" height="416" alt="ViT Architecture">
+	<figcaption>
+	<small>
+	
+	 Main Architecture of ViT (from the paper). 
+	
+	</small>
+	</figcaption>
+</figure>  
+<p>Another important point this paper made is that transformers didn&rsquo;t do better than CNNs on smaller datasets like the original ImageNet (~1M images). It wasn&rsquo;t until they used a ~300M image dataset that the transformer clearly outperformed CNNs. One reason why transformers may need to see a lot more data before they are competitive with CNNs is that they don&rsquo;t have the same inductive bias. CNNs are designed to learn patterns (filters) that are translationally invariant. This is useful because objects can appear anywhere in an image and so you want a model to learn the general concept while largely ignoring where globally the pattern appears.</p>
+<p>One cool thing to see from the paper is the visualization of the linear projection that is learned by the model. The visualization shows lower level edge and blob like patterns which look similar to what you would expect is learned in the earlier layers of a CNN. We can then think of this linear projection as extracting features from the images.</p>
+<h4 id="detection-transformer-detr">Detection Transformer (DETR)</h4>
+<p>Another early work in leveraging transformers for vision is the <a href="https://arxiv.org/pdf/2005.12872" target="_blank" rel="noopener">Detection Transformer (DETR)</a> paper from Facebook. At a high level the paper demonstrates that you can leverage transformers to predict in parallel a set of bounding boxes (and classes) and do well at object detection while using a simpler architecture than some of the earlier state of the art approaches (like Faster R-CNN). They also demonstrate results for the problem of segmentation.</p>
+<p>Once again, zooming in a bit we see that the paper brings together several ingredients including a CNN, an encoder-decoder transformer, and a feed forward network to predict individual bounding boxes and classes.</p>
+<p>The CNN applies a large number of filters (e.g 2048) to the input image which results in a large number of lower resolution outputs/responses. These lower resolution activation maps are reduced from having \(C\) filters to \(d\) filters/dimensions. After reshaping these outputs we get a sequence of \(HW\) \(d\)-dimensional vectors, where \(H\) and \(W\) are the height and width of the outputs. We can then think of this sequence as as a sequence of image features corresponding to different parts of the image which are then fed into an encoder transformer.</p>
+<p>The encoder output is then available for use by the decoder whose outputs are fed through a relatively shallow FFN to predict bounding boxes and classes. A really important aspect to training this model is that predicted detections need to be compared to ground truth objects. In order to do this comparison you want to first identify which pairs of predictions and ground truth objects go together. This is done using the hungarian algorithm which performs bipartite matching such that the matching cost is minimized/maximized. In order to allow the model to predict all of the objects in an image they choose a value \(N\) that represents the largest number of objects expected in an image. If the actual number of objects is below \(N\) then dummy &ldquo;no object&rdquo; objects are added to the ground truth object set so that surplus predictions can be matched in the bipartite matching. An illustration of the overall model is shown below.</p>
+
+
+
+
+
+
+
+
+<figure style="padding: 0.25rem; margin: 0.25rem 0; background-color: #ffffff; float: none; display: block;text-align: center;">
+	<img style="width: auto; height: auto; float: none; display: block; margin-left: auto; margin-right: auto;text-align: center;" src="/vision-meets-transformers/detr_hu8800048473385603423.png" width="1000" height="265" alt="DETR Architecture">
+	<figcaption>
+	<small>
+	
+	 Illustration of DETR Model (from the paper). 
+	
+	</small>
+	</figcaption>
+</figure>  
+<p>One interesting quirk in this paper is deciding what inputs the decoder should receive. We know that the decoder can gain a good understanding of different parts of the image by attending to encoder outputs. We also know that decoder outputs should represent various object predictions. The authors chose to simply treat these decoder inputs as learnable positional embeddings (which they refer to as object queries). The main intuition for this seems to be rooted in the requirement that the input vectors need to be distinct from one another.
+We can see this is needed because if all inputs were identical then the result of both self attention and cross attention would be identical for every vector ultimately leading to the same exact object prediction from each decoder output. Given that distinct values are needed the authors decided the specific choice can be left to the model to learn. It makes sense that the model would learn distinct object queries because otherwise the loss function would heavily penalize repeated object predictions (as only one could possibly be matched to the right object).</p>
+<h4 id="conclusion">Conclusion</h4>
+<p>These early works which apply transformers to computer vision demonstrate that with large quantities of data and compute you can get state of the art performance. In many ways this isn&rsquo;t surprising given the enormous success of transformers in modeling language. Does this mean that transformers are better than CNNs for all real world vision applications? Of course not! You have to pick the right tool for the application and its constraints.</p>
+<h4 id="references">References</h4>
+<ul>
+<li><a href="https://arxiv.org/pdf/2010.11929" target="_blank" rel="noopener">Vision Transformer (ViT) Paper</a></li>
+<li><a href="https://arxiv.org/pdf/2005.12872" target="_blank" rel="noopener">Detection Transformer (DETR) paper</a></li>
+<li><a href="https://www.youtube.com/watch?v=T35ba_VXkMY" target="_blank" rel="noopener">DETR YouTube Video</a> - Nice video on the paper from Yannic Kilcher.</li>
+</ul>
+
+</content>
+<p>
+  
+</p>
+
+  </main>
+  <footer><small>
+  Copyright &copy; 2025 Mikhail Breslav 
+</small></footer>
+
+    
+</body>
+
+</html>
