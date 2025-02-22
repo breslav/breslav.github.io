@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0" />
+<link rel="shortcut icon" href="https://breslav.github.io/images/favicon-32x32.png" />
+<title>Oops, Contrastive Representation Learning | Mikhail Breslav</title>
+<meta name="title" content="Oops, Contrastive Representation Learning" />
+<meta name="description" content="Originally I wanted to focus this blog post on a vision &#43; transformer paper known as DINO. I quickly realized that I would need to recurse into background reading before I could understand DINO. So instead this post will be about contrastive representation learning and several other papers which will help with understanding DINO. Hence the title beginning with Oops.
+We&rsquo;ll begin by reviewing contrastive representation learning which will set the stage for a few important papers." />
+<meta name="keywords" content="" />
+
+
+<meta property="og:url" content="https://breslav.github.io/oops-contrastive-representation-learning/">
+  <meta property="og:site_name" content="Mikhail Breslav">
+  <meta property="og:title" content="Oops, Contrastive Representation Learning">
+  <meta property="og:description" content="Originally I wanted to focus this blog post on a vision &#43; transformer paper known as DINO. I quickly realized that I would need to recurse into background reading before I could understand DINO. So instead this post will be about contrastive representation learning and several other papers which will help with understanding DINO. Hence the title beginning with Oops.
+We’ll begin by reviewing contrastive representation learning which will set the stage for a few important papers.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2025-02-20T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-02-20T00:00:00+00:00">
+    <meta property="og:image" content="https://breslav.github.io/images/share.png">
+
+
+
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://breslav.github.io/images/share.png">
+  <meta name="twitter:title" content="Oops, Contrastive Representation Learning">
+  <meta name="twitter:description" content="Originally I wanted to focus this blog post on a vision &#43; transformer paper known as DINO. I quickly realized that I would need to recurse into background reading before I could understand DINO. So instead this post will be about contrastive representation learning and several other papers which will help with understanding DINO. Hence the title beginning with Oops.
+We’ll begin by reviewing contrastive representation learning which will set the stage for a few important papers.">
+
+
+
+
+  <meta itemprop="name" content="Oops, Contrastive Representation Learning">
+  <meta itemprop="description" content="Originally I wanted to focus this blog post on a vision &#43; transformer paper known as DINO. I quickly realized that I would need to recurse into background reading before I could understand DINO. So instead this post will be about contrastive representation learning and several other papers which will help with understanding DINO. Hence the title beginning with Oops.
+We’ll begin by reviewing contrastive representation learning which will set the stage for a few important papers.">
+  <meta itemprop="datePublished" content="2025-02-20T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2025-02-20T00:00:00+00:00">
+  <meta itemprop="wordCount" content="1581">
+  <meta itemprop="image" content="https://breslav.github.io/images/share.png">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  body {
+    font-family: Verdana, sans-serif;
+    margin: auto;
+    padding: 20px;
+    max-width: 720px;
+    text-align: left;
+    background-color: white;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: #444;
+  }
+
+  figure {
+    float: left;
+    margin-top: 0.2cm;
+    margin-left: auto;
+    margin-right: 0.5cm;
+  }
+
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  b {
+    color: #222;
+  }
+
+  a {
+    color: #3273dc;
+  }
+
+  .title {
+    text-decoration: none;
+    border: 0;
+  }
+
+  .title span {
+    font-weight: 400;
+  }
+
+  nav a {
+    margin-right: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+
+  content {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    padding: 2px 5px;
+    background-color: #eee;
+  }
+
+  pre code {
+    border-left: 1px solid #999;
+    color: #555;
+    display: block;
+    padding: 10px;
+    white-space: pre-wrap;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: #555;
+    padding-left: 10px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px;
+    text-align: center;
+  }
+
+  .helptext {
+    color: #777;
+    font-size: small;
+  }
+
+  .errorlist {
+    color: #eba613;
+    font-size: small;
+  }
+
+  h4 {
+    margin-bottom: -0.25cm;
+}
+</style>
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-ND7MED44L2"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-ND7MED44L2');
+        }
+      </script>
+
+  
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],  
+      inlineMath: [['\\(', '\\)']]                  
+    }
+  };
+</script>
+  
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>Mikhail Breslav</h2>
+</a>
+<nav><a href="/">Home</a>
+
+<a href="/cv/">CV</a>
+
+<a href="/blog">Blog</a>
+</nav>
+</header>
+  <main>
+
+<h1>Oops, Contrastive Representation Learning</h1>
+<p>
+  <i>
+    <time datetime='2025-02-20' pubdate>
+      20 Feb, 2025
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>Originally I wanted to focus this blog post on a vision + transformer paper known as <a href="https://arxiv.org/pdf/2104.14294" target="_blank" rel="noopener">DINO</a>. I quickly realized that I would need to recurse into background reading before I could understand DINO. So instead this post will be about contrastive representation learning and several other papers which will help with understanding DINO. Hence the title beginning with Oops.</p>
+<p>We&rsquo;ll begin by reviewing contrastive representation learning which will set the stage for a few important papers.</p>
+<h4 id="contrastive-representation-learning">Contrastive Representation Learning</h4>
+<p>There is this broad concept that if we have a bunch of data points (e.g images) we would like to be able to learn a good representation of them. One way to set this up as a learning problem is to encourage similar data points to be closer together in the representation space and unlike data points to be farther appart.</p>
+<p>One place where I had seen this broad concept was in the <a href="https://www.cs.princeton.edu/courses/archive/spring13/cos598C/Gionis.pdf" target="_blank" rel="noopener">Locality-Sensitive Hashing (LSH)</a> paper, which I encountered in grad school. The general idea is that you want to preserve relative distances of data points in their original space when coming up with a &ldquo;good&rdquo; low dimensional representation.</p>
+<p>Another work I encountered in the past was <a href="https://arxiv.org/pdf/1503.03832" target="_blank" rel="noopener">FaceNet</a> where they learn representations of faces by encouraging faces from the same person to be closer in representation space than faces from two different people. They introduce a triplet loss, illustrated below, which encodes this objective.</p>
+
+
+
+
+
+
+
+
+<figure style="padding: 0.25rem; margin: 0.25rem 0; background-color: #ffffff; float: none; display: block;text-align: center;">
+	<img style="width: auto; height: auto; float: none; display: block; margin-left: auto; margin-right: auto;text-align: center;" src="/oops-contrastive-representation-learning/triplet_loss_graphic_hu17192921647372463842.png" width="600" height="144" alt="Triplet Loss">
+	<figcaption>
+	<small>
+	
+	 Illustration of the Triplet Loss (from the paper). 
+	
+	</small>
+	</figcaption>
+</figure>  
+<p>The triplet loss says that some person&rsquo;s face (represented by an anchor) should be closer in representation to some other photo of their face (represented by the positive sample) than to some photo of someone elses face (represented by a negative sample). This is a triplet loss because the loss requires three representations (anchor, positive, negative) to be computed. You&rsquo;ll also notice in the paper that there is a hyperparameter \(\alpha\) which is used to set a margin, meaning the distance between anchor and negative must be at least \(\alpha\) more than the distance between anchor and positive. The representation is also constrained to have a magnitude of \(1\).</p>
+<p>We can think of this triplet loss as an example of <em>supervised</em> contrastive representation learning since the loss depends on the identity of a face image which is provided by labels. Next we look at the <a href="https://arxiv.org/pdf/2002.05709" target="_blank" rel="noopener">SimCLR</a> paper which requires no labels and is an example of <em>self-supervised</em> contrastive representation learning.</p>
+<h4 id="a-simple-framework-for-contrastive-learning-simclr">A Simple Framework for Contrastive Learning (SimCLR)</h4>
+<p>SimCLR proposes a framework to apply contrastive learning to images without the need for labels and hence it is a self-supervised approach. In general I would expect self-supervision to outperform supervision because it enables using a lot more data and the signal for training is not limited to labels which could be relatively shallow (e.g describing a rich image with a single label).</p>
+<p>In the image below we see the main idea behind self-supervised contrastive learning.
+
+
+
+
+
+
+
+
+<figure style="padding: 0.25rem; margin: 0.25rem 0; background-color: #ffffff; float: none; display: block;text-align: center;">
+	<img style="width: auto; height: auto; float: none; display: block; margin-left: auto; margin-right: auto;text-align: center;" src="/oops-contrastive-representation-learning/simclr_hu379234526344821758.png" width="500" height="383" alt="SimCLR Architecture">
+	<figcaption>
+	<small>
+	
+	 Main Architecture of SimCLR (from the paper). 
+	
+	</small>
+	</figcaption>
+</figure>  </p>
+<ul>
+<li>First we take an image \(x\) and apply two different random transformations (image augmentations) to them (e.g cropping, blurring, color distortion).</li>
+<li>Then you feed the two different augmentations through some encoder \(f\) (often chosen to be ResNet) which produces a representation \(h\).</li>
+<li>You then feed the representation through a small neural network (\(g\)), referred to as a projection head, which produces a vector \(z\).</li>
+<li>A contrastive loss is then defined which takes as input the two final representations \(z_{i}\) and \(z_{j}\) (each representing a different augmentation of the source image).</li>
+</ul>
+<p>The loss, similar to what we&rsquo;ve seen before, encourages the representations of the augmentations for the same source image to be very similar to each other, while being dissimilar from the other augmentations in the batch. If we further zoom into the loss formulation in the paper we see the following:</p>
+<ul>
+<li>Looking at the paper the similarity between two representations is taken as the cosine distance which is the dot product of the normalized vectors.</li>
+<li>We also see the loss is of the form \(l_{i,j}=-log(num/den)\) which means we want the denominator to be small so that the fraction is larger and the \(log\) is larger and therefore the loss is smaller.</li>
+<li>The denominator is a sum of similiarities between \(z_{i}\) and all representations in the batch from other source images. This means the loss encourages \(z_{i}\) to be dissimilar to all augmentations from other source images in the batch. (Small aside the paper is confusing because it appears \(z_{j}\) is included in the denominator in the equations, despite the text saying that negative examples come from the other \(2(N-1)\) examples. Perhaps it doesn&rsquo;t really matter whether it is included or not?).</li>
+<li>Finally we see that the total loss is the average of individual losses \(l_{i,j} + l_{j,i}\) for \(N\) source images in the batch. Notice that \(l_{i,j}\) alone is not symmetric due to the denominator but if you add \(l_{j,i}\) then you do have a symmetric loss.</li>
+</ul>
+<p>After training the model, what you end up using is just the encoder \(f\), while the projection head is discarded. This encoder \(f\) should then be able to produce representations of images that are useful for downstream tasks. Indeed SimCLR demonstrated that their representation combined with a linear classifier outperformed other techniques on classifying ImageNet images.</p>
+<h4 id="bootstrap-your-own-latent-byol">Bootstrap Your Own Latent (BYOL)</h4>
+<p>Now we&rsquo;re going to look at a paper that outperforms SimCLR but is similar in design and so our understanding of SimCLR will be very helpful here.</p>
+<p><a href="https://arxiv.org/pdf/2006.07733" target="_blank" rel="noopener">BYOL</a>, like SimCLR, aims to learn a &ldquo;good&rdquo; image representation without the need for labels. We again define a representation to be &ldquo;good&rdquo; if it can be used to perform many downstream tasks well.</p>
+<p>The way BYOL works is depicted in the figure below and it involves the following steps:</p>
+<ul>
+<li>Take an image \(x\) and perform two different data augmentations on it, leading to \(v\) and \(v'\).</li>
+<li>Input each augmented image into two different neural networks, one having parameters \(\theta\) which is part of the &ldquo;online&rdquo; network and the other \(\xi\) which is part of the &ldquo;target&rdquo; network. In the paper these neural networks are ResNet CNNs.</li>
+<li>The online network has two additional MLPs that follow the ResNet. The output of the online network can be thought of as some function of \(z_{\theta}\), where \(z_{\theta}\) is a lower dimensional representation of the first augmented image \(v\).</li>
+<li>The target network has one additional MLP that generates a lower dimensional representation of the second augmented image \(v'\) called \(z'_{\xi}\).</li>
+<li>Now the goal is for the two networks to output the same vector which is what the loss function is designed to encourage. There are also several interesting quirks about training:
+<ul>
+<li>Only the online network is trained. In other words each training step only modifies the weights \(\theta\).</li>
+<li>The target network weights are taken as an exponential moving average. In other words the target network weights are updated to be a combination of itself and the latest online weights.</li>
+</ul>
+</li>
+<li>Lastly, after training most of the architecture is thrown away. The only part that is kept is the now trained ResNet which hopefully has learned to produce a &ldquo;good&rdquo; image representation.</li>
+</ul>
+
+
+
+
+
+
+
+
+<figure style="padding: 0.25rem; margin: 0.25rem 0; background-color: #ffffff; float: none; display: block;text-align: center;">
+	<img style="width: auto; height: auto; float: none; display: block; margin-left: auto; margin-right: auto;text-align: center;" src="/oops-contrastive-representation-learning/byol_hu932510424687096009.png" width="800" height="485" alt="BYOL Architecture">
+	<figcaption>
+	<small>
+	
+	 Main Architecture of BYOL (from the paper). 
+	
+	</small>
+	</figcaption>
+</figure>  
+<p>My high level understanding of this model is that like SimCLR it learns that different augmentations of an image don&rsquo;t change the underlying meaning of the image. If we learn a good representation for the original dog image then we would expect the two augmentations to be related by a relatively simple function (represented by \(q_{\theta}\)).</p>
+<p>One important difference between BYOL and SimCLR is that BYOL does not make use of any negative examples. This is not only an improvement in terms of computation but it also avoids having to worry about some of the nuances of how you pick the best negative examples to use. You also don&rsquo;t need to use as large of a batch size which is more important in SimCLR where you do need good negative examples.</p>
+<p>If we think about why negative examples are used in the first place it&rsquo;s to help the learning process by not just saying what should be similar but by also saying what should be disimilar. You also prevent the model from just outputting the same vector for every single input since that would be violating the dissimilarity part of the loss.</p>
+<p>This leads to the mystery of this paper which is how the model prevents the networks from learning a trivial solution (known as mode collapse) to the problem given that there are no negative examples being used. The authors state that in practice the model does not converge to the trivial solution and so in practice this problem does not arise.</p>
+<p>What I also found a bit challenging to wrap my head around initially is that there are two networks with different parameters but one kind of tracks the other. However after reading SimCLR, which I originally read after BYOL, it isn&rsquo;t as weird since SimCLR can be thought of as using the same network twice with the same parameters, this is more of a tweak on that.</p>
+<p>For this paper I once again recommend the commentary from <a href="#references">Yannic Kilcher&rsquo;s</a> YT Video which helped my understanding of the paper.</p>
+<h4 id="conclusion">Conclusion</h4>
+<p>Writing this blog post was pretty helpful for me because I hadn&rsquo;t been exposed to self-supervised representation learning in the vision domain. Stay tuned for my post on DINO!</p>
+<h4 id="references">References</h4>
+<ul>
+<li><a href="https://arxiv.org/pdf/2002.05709" target="_blank" rel="noopener">SimCLR</a></li>
+<li><a href="https://arxiv.org/pdf/2006.07733" target="_blank" rel="noopener">Bootstrap Your Own Latent (BYOL)</a></li>
+<li><a href="https://www.youtube.com/watch?v=YPfUiOMYOEE" target="_blank" rel="noopener">BYOL YT Video</a> Another helpful video from Yannic Kilcher&rsquo;s YT page.</li>
+</ul>
+
+</content>
+<p>
+  
+</p>
+
+  </main>
+  <footer><small>
+  Copyright &copy; 2025 Mikhail Breslav 
+</small></footer>
+
+    
+</body>
+
+</html>

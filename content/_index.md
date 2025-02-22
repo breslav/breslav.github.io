@@ -2,7 +2,7 @@
 
 {{< figure src="/images/profile.jpg" width="275" >}}
 
-Hi everyone! I'm Mikhail and I'm an applied scientist who enjoys bringing novel and experimental ideas to life via software development. I am generally interested in machine learning and its application in domains like computer vision, language processing, and autonomous robots. 
+Hi everyone! I'm Mikhail and I'm an Applied Scientist who enjoys bringing novel and experimental ideas to life via software development. I am generally interested in machine learning and its application in domains like computer vision, language processing, and autonomous vehicles/robots. 
 
 Currently, I'm a systems engineer at [Cruise](http://www.getcruise.com "") working on validating the safety of autonomous vehicles. Previously, I was an Applied Scientist at [Microsoft](https://www.microsoft.com "") working on a [code recommendation tool](http://aka.ms/IntelliCodeAPIUsageExamples "").
 
@@ -12,7 +12,7 @@ I also earned my B.S. & M.S. degrees from the [Department of Electrical Engineer
 
 My past research can be viewed on [Google Scholar](https://scholar.google.com/citations?user=gW857EAAAAAJ&hl=en "").
 
-When I'm not working I enjoy outdoor activities such as [hiking](https://www.wta.org ""). 
+When I'm not working I enjoy spending time with my family and exploring the outdoors through [hiking](https://www.wta.org ""). 
 
 #### Contact
 I can be reached at **first dot last at gmail**.
