@@ -7,8 +7,22 @@
     <generator>Hugo</generator>
     <language>en-US</language>
     <copyright>Copyright © 2025, Mikhail Breslav.....</copyright>
-    <lastBuildDate>Fri, 07 Feb 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 20 Feb 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://breslav.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Oops, Contrastive Representation Learning</title>
+      <link>https://breslav.github.io/oops-contrastive-representation-learning/</link>
+      <pubDate>Thu, 20 Feb 2025 00:00:00 +0000</pubDate>
+      <guid>https://breslav.github.io/oops-contrastive-representation-learning/</guid>
+      <description>&lt;p&gt;Originally I wanted to focus this blog post on a vision + transformer paper known as &lt;a href=&#34;https://arxiv.org/pdf/2104.14294&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;DINO&lt;/a&gt;. I quickly realized that I would need to recurse into background reading before I could understand DINO. So instead this post will be about contrastive representation learning and several other papers which will help with understanding DINO. Hence the title beginning with Oops.&lt;/p&gt;&#xA;&lt;p&gt;We&amp;rsquo;ll begin by reviewing contrastive representation learning which will set the stage for a few important papers.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Vision Meets Transformers</title>
+      <link>https://breslav.github.io/vision-meets-transformers/</link>
+      <pubDate>Tue, 18 Feb 2025 00:00:00 +0000</pubDate>
+      <guid>https://breslav.github.io/vision-meets-transformers/</guid>
+      <description>&lt;p&gt;When I began my PhD in computer vision the leading approaches of the day were models like support vector machines, probabilistic graphical models, and decision trees. Fast-forward to 2016 when I was graduating and the deep learning revolution was underway. Leading approaches were convolutional neural networks like &lt;a href=&#34;https://proceedings.neurips.cc/paper_files/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;AlexNet&lt;/a&gt;, &lt;a href=&#34;https://arxiv.org/pdf/1409.1556&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;VGG&lt;/a&gt;, and &lt;a href=&#34;https://arxiv.org/pdf/1512.03385&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ResNet&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;p&gt;I had the fortune to play with CNNs for the final project of my PhD.  Specifically, I experimented with finetuning a VGG-16 CNN on a very small dataset for the task of pose estimation. The &lt;a href=&#34;https://arxiv.org/pdf/2010.11929&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;results&lt;/a&gt; weren&amp;rsquo;t very good which I think was due to a combination of having a very limited training set and targeting a domain too different from the source domain. I was working with grayscale images of moths captured in a laboratory which looked nothing like the &lt;a href=&#34;https://www.image-net.org&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ImageNet&lt;/a&gt; images used to train the base model.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Brief Notes on Attention Efficiency</title>
       <link>https://breslav.github.io/brief-notes-on-attention-efficiency/</link>
