@@ -7,15 +7,8 @@
     <generator>Hugo</generator>
     <language>en-US</language>
     <copyright>Copyright © 2025, Mikhail Breslav.....</copyright>
-    <lastBuildDate>Fri, 21 Feb 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 20 Feb 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://breslav.github.io/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>DINO</title>
-      <link>https://breslav.github.io/dino/</link>
-      <pubDate>Fri, 21 Feb 2025 00:00:00 +0000</pubDate>
-      <guid>https://breslav.github.io/dino/</guid>
-      <description>&lt;h4 id=&#34;dino&#34;&gt;DINO&lt;/h4&gt;&#xA;&lt;p&gt;Finally we are ready to look at and understand &lt;a href=&#34;https://arxiv.org/pdf/2104.14294&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;DINO&lt;/a&gt; at least at a high level! Looking at the architecture of DINO below we&amp;rsquo;ll notice it looks pretty similar to BYOL. We have:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Once again we have a source image \(x\) which is used to generate two different views/augmentations \(x_{1}\) and \(x_{2}\).&lt;/li&gt;&#xA;&lt;li&gt;These are fed into a student and teacher respectively which have the same architecture but different parameters (like BYOL).&lt;/li&gt;&#xA;&lt;li&gt;The teacher parameters are based on an exponential moving average of the student parameters (like BYOL).&lt;/li&gt;&#xA;&lt;li&gt;Only the student learns (like BYOL).&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;Where it differs from BYOL is that here the teacher is followed by a centering operation and each network outputs a \(K\) dimensional probability distribution which is fed into a cross entropy loss.&lt;/p&gt;</description>
-    </item>
     <item>
       <title>Oops, Contrastive Representation Learning</title>
       <link>https://breslav.github.io/oops-contrastive-representation-learning/</link>
