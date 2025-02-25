@@ -42,7 +42,7 @@ The loss, similar to what we've seen before, encourages the representations of t
 After training the model, what you end up using is just the encoder \(f\), while the projection head is discarded. This encoder \(f\) should then be able to produce representations of images that are useful for downstream tasks. Indeed SimCLR demonstrated that their representation combined with a linear classifier outperformed other techniques on classifying ImageNet images.
 
 
-#### Bootstrap Your Own Latent (BYOL)
+#### Bootstrap Your Own Latent (BYOL) {#byol}
 Now we're going to look at a paper that outperforms SimCLR but is similar in design and so our understanding of SimCLR will be very helpful here. 
 
 [BYOL](https://arxiv.org/pdf/2006.07733), like SimCLR, aims to learn a "good" image representation without the need for labels. We again define a representation to be "good" if it can be used to perform many downstream tasks well. 
@@ -72,7 +72,9 @@ What I also found a bit challenging to wrap my head around initially is that the
 For this paper I once again recommend the commentary from [Yannic Kilcher's](#references) YT Video which helped my understanding of the paper. 
 
 #### Conclusion
-Writing this blog post was pretty helpful for me because I hadn't been exposed to self-supervised representation learning in the vision domain. Stay tuned for my post on DINO! 
+Writing this blog post was pretty helpful for me because I hadn't been exposed to self-supervised representation learning in the vision domain. 
+
+~~Stay tuned for my post on DINO~~. My post on [DINO]({{< ref "/blog/2025-02-21-dino" >}} "") is now up!
 
 
 #### References
