@@ -7,8 +7,15 @@
     <generator>Hugo</generator>
     <language>en-US</language>
     <copyright>Copyright © 2025, Mikhail Breslav.....</copyright>
-    <lastBuildDate>Thu, 20 Feb 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 02 Mar 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://breslav.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Reviewing Linear Regression</title>
+      <link>https://breslav.github.io/reviewing-linear-regression/</link>
+      <pubDate>Sun, 02 Mar 2025 00:00:00 +0000</pubDate>
+      <guid>https://breslav.github.io/reviewing-linear-regression/</guid>
+      <description>&lt;p&gt;Linear regression is a foundational model both in the machine learning context as well as the statistics context. While at a surface level it&amp;rsquo;s generally considered a simple model, under the hood there is a fair amount of math and nuance. In this blog post I want to review the most important concepts associated with linear regression (at least from a ML point of view).&lt;/p&gt;&#xA;&lt;h3 id=&#34;core&#34;&gt;Core&lt;/h3&gt;&#xA;&lt;p&gt;Linear regression models the relationship between some dependent variable \(y\) and independent variable \(x\) as being linear. With a single independent variable it is commonly expressed as: \(y = wx + b\) or equivalently \(y = w_{0} + w_{1}x\). In multiple linear regression where we have multiple independent variables it can be expressed as: \(y = w_{0} + w_{1}x_{1} + w_{2}x_{2} + \cdots + w_{n}x_{n}\) which in vector notation is \(y = \vec{w} \cdot \vec{x}\).&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Oops, Contrastive Representation Learning</title>
       <link>https://breslav.github.io/oops-contrastive-representation-learning/</link>
