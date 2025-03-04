@@ -42,7 +42,7 @@ We’ll begin by reviewing contrastive representation learning which will set th
 We’ll begin by reviewing contrastive representation learning which will set the stage for a few important papers.">
   <meta itemprop="datePublished" content="2025-02-20T00:00:00+00:00">
   <meta itemprop="dateModified" content="2025-02-20T00:00:00+00:00">
-  <meta itemprop="wordCount" content="1581">
+  <meta itemprop="wordCount" content="1588">
   <meta itemprop="image" content="https://breslav.github.io/images/share.png">
 <meta name="referrer" content="no-referrer-when-downgrade" />
 
@@ -270,7 +270,7 @@ We’ll begin by reviewing contrastive representation learning which will set th
 <li>Finally we see that the total loss is the average of individual losses \(l_{i,j} + l_{j,i}\) for \(N\) source images in the batch. Notice that \(l_{i,j}\) alone is not symmetric due to the denominator but if you add \(l_{j,i}\) then you do have a symmetric loss.</li>
 </ul>
 <p>After training the model, what you end up using is just the encoder \(f\), while the projection head is discarded. This encoder \(f\) should then be able to produce representations of images that are useful for downstream tasks. Indeed SimCLR demonstrated that their representation combined with a linear classifier outperformed other techniques on classifying ImageNet images.</p>
-<h4 id="bootstrap-your-own-latent-byol">Bootstrap Your Own Latent (BYOL)</h4>
+<h4 id="byol">Bootstrap Your Own Latent (BYOL)</h4>
 <p>Now we&rsquo;re going to look at a paper that outperforms SimCLR but is similar in design and so our understanding of SimCLR will be very helpful here.</p>
 <p><a href="https://arxiv.org/pdf/2006.07733" target="_blank" rel="noopener">BYOL</a>, like SimCLR, aims to learn a &ldquo;good&rdquo; image representation without the need for labels. We again define a representation to be &ldquo;good&rdquo; if it can be used to perform many downstream tasks well.</p>
 <p>The way BYOL works is depicted in the figure below and it involves the following steps:</p>
@@ -312,7 +312,8 @@ We’ll begin by reviewing contrastive representation learning which will set th
 <p>What I also found a bit challenging to wrap my head around initially is that there are two networks with different parameters but one kind of tracks the other. However after reading SimCLR, which I originally read after BYOL, it isn&rsquo;t as weird since SimCLR can be thought of as using the same network twice with the same parameters, this is more of a tweak on that.</p>
 <p>For this paper I once again recommend the commentary from <a href="#references">Yannic Kilcher&rsquo;s</a> YT Video which helped my understanding of the paper.</p>
 <h4 id="conclusion">Conclusion</h4>
-<p>Writing this blog post was pretty helpful for me because I hadn&rsquo;t been exposed to self-supervised representation learning in the vision domain. Stay tuned for my post on DINO!</p>
+<p>Writing this blog post was pretty helpful for me because I hadn&rsquo;t been exposed to self-supervised representation learning in the vision domain.</p>
+<p><del>Stay tuned for my post on DINO</del>. My post on <a href="https://breslav.github.io/self-supervised-vision-transformers/">DINO</a> is now up!</p>
 <h4 id="references">References</h4>
 <ul>
 <li><a href="https://arxiv.org/pdf/2002.05709" target="_blank" rel="noopener">SimCLR</a></li>
