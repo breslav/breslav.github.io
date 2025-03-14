@@ -123,7 +123,7 @@ Largely, I have focused on linear regression through the lens of ML but I wanted
 
 If you're looking for a good starting point to play with linear regression consider the scikit library. The library documenation shows how to use [linear regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html) and also points to linear regression functions that incorporate the different kinds of [regularization](#regularization) we discussed.
 
-Stay tuned for a follow up post on logistic regression which is the cousin of linear regression.
+Update! Checkout my follow up post on [logistic regression]({{< ref "/blog/2025-03-10-logr" >}} "") (the cousin to linear regression)!
 
 
 #### References

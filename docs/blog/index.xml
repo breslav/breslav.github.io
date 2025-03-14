@@ -7,8 +7,15 @@
     <generator>Hugo</generator>
     <language>en-US</language>
     <copyright>Copyright © 2025, Mikhail Breslav.....</copyright>
-    <lastBuildDate>Sun, 02 Mar 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 10 Mar 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://breslav.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Reviewing Logistic Regression</title>
+      <link>https://breslav.github.io/reviewing-logistic-regression/</link>
+      <pubDate>Mon, 10 Mar 2025 00:00:00 +0000</pubDate>
+      <guid>https://breslav.github.io/reviewing-logistic-regression/</guid>
+      <description>&lt;p&gt;After my post reviewing &lt;a href=&#34;https://breslav.github.io/reviewing-linear-regression/&#34;&gt;linear regression&lt;/a&gt; it was only natural to review its relative logistic regression.&#xA;Logistic regression is another foundational model in machine learning and statistics. In this blog post I want to review the most important concepts associated with logistic regression (at least from a ML point of view).&lt;/p&gt;&#xA;&lt;h3 id=&#34;introduction&#34;&gt;Introduction&lt;/h3&gt;&#xA;&lt;p&gt;Logistic regression is a popular regression model that is used to model the probability of some binary outcome. For example we can use it to model the probability that an email is spam or that a customer will buy a bicycle today.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Reviewing Linear Regression</title>
       <link>https://breslav.github.io/reviewing-linear-regression/</link>

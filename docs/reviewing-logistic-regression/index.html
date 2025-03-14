@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0" />
+<link rel="shortcut icon" href="https://breslav.github.io/images/favicon-32x32.png" />
+<title>Reviewing Logistic Regression | Mikhail Breslav</title>
+<meta name="title" content="Reviewing Logistic Regression" />
+<meta name="description" content="After my post reviewing linear regression it was only natural to review its relative logistic regression.
+Logistic regression is another foundational model in machine learning and statistics. In this blog post I want to review the most important concepts associated with logistic regression (at least from a ML point of view).
+Introduction
+Logistic regression is a popular regression model that is used to model the probability of some binary outcome. For example we can use it to model the probability that an email is spam or that a customer will buy a bicycle today." />
+<meta name="keywords" content="" />
+
+
+<meta property="og:url" content="https://breslav.github.io/reviewing-logistic-regression/">
+  <meta property="og:site_name" content="Mikhail Breslav">
+  <meta property="og:title" content="Reviewing Logistic Regression">
+  <meta property="og:description" content="After my post reviewing linear regression it was only natural to review its relative logistic regression. Logistic regression is another foundational model in machine learning and statistics. In this blog post I want to review the most important concepts associated with logistic regression (at least from a ML point of view).
+Introduction Logistic regression is a popular regression model that is used to model the probability of some binary outcome. For example we can use it to model the probability that an email is spam or that a customer will buy a bicycle today.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2025-03-10T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-03-10T00:00:00+00:00">
+    <meta property="og:image" content="https://breslav.github.io/images/share.png">
+
+
+
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://breslav.github.io/images/share.png">
+  <meta name="twitter:title" content="Reviewing Logistic Regression">
+  <meta name="twitter:description" content="After my post reviewing linear regression it was only natural to review its relative logistic regression. Logistic regression is another foundational model in machine learning and statistics. In this blog post I want to review the most important concepts associated with logistic regression (at least from a ML point of view).
+Introduction Logistic regression is a popular regression model that is used to model the probability of some binary outcome. For example we can use it to model the probability that an email is spam or that a customer will buy a bicycle today.">
+
+
+
+
+  <meta itemprop="name" content="Reviewing Logistic Regression">
+  <meta itemprop="description" content="After my post reviewing linear regression it was only natural to review its relative logistic regression. Logistic regression is another foundational model in machine learning and statistics. In this blog post I want to review the most important concepts associated with logistic regression (at least from a ML point of view).
+Introduction Logistic regression is a popular regression model that is used to model the probability of some binary outcome. For example we can use it to model the probability that an email is spam or that a customer will buy a bicycle today.">
+  <meta itemprop="datePublished" content="2025-03-10T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2025-03-10T00:00:00+00:00">
+  <meta itemprop="wordCount" content="2135">
+  <meta itemprop="image" content="https://breslav.github.io/images/share.png">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  body {
+    font-family: Verdana, sans-serif;
+    margin: auto;
+    padding: 20px;
+    max-width: 720px;
+    text-align: left;
+    background-color: white;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: #444;
+  }
+
+  figure {
+    float: left;
+    margin-top: 0.2cm;
+    margin-left: auto;
+    margin-right: 0.5cm;
+  }
+
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  b {
+    color: #222;
+  }
+
+  a {
+    color: #3273dc;
+  }
+
+  .title {
+    text-decoration: none;
+    border: 0;
+  }
+
+  .title span {
+    font-weight: 400;
+  }
+
+  nav a {
+    margin-right: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+
+  content {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    padding: 2px 5px;
+    background-color: #eee;
+  }
+
+  pre code {
+    border-left: 1px solid #999;
+    color: #555;
+    display: block;
+    padding: 10px;
+    white-space: pre-wrap;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: #555;
+    padding-left: 10px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px;
+    text-align: center;
+  }
+
+  .helptext {
+    color: #777;
+    font-size: small;
+  }
+
+  .errorlist {
+    color: #eba613;
+    font-size: small;
+  }
+
+  h4 {
+    margin-bottom: -0.25cm;
+}
+</style>
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-ND7MED44L2"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-ND7MED44L2');
+        }
+      </script>
+
+  
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],  
+      inlineMath: [['\\(', '\\)']]                  
+    }
+  };
+</script>
+  
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>Mikhail Breslav</h2>
+</a>
+<nav><a href="/">Home</a>
+
+<a href="/cv/">CV</a>
+
+<a href="/blog">Blog</a>
+</nav>
+</header>
+  <main>
+
+<h1>Reviewing Logistic Regression</h1>
+<p>
+  <i>
+    <time datetime='2025-03-10' pubdate>
+      10 Mar, 2025
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>After my post reviewing <a href="https://breslav.github.io/reviewing-linear-regression/">linear regression</a> it was only natural to review its relative logistic regression.
+Logistic regression is another foundational model in machine learning and statistics. In this blog post I want to review the most important concepts associated with logistic regression (at least from a ML point of view).</p>
+<h3 id="introduction">Introduction</h3>
+<p>Logistic regression is a popular regression model that is used to model the probability of some binary outcome. For example we can use it to model the probability that an email is spam or that a customer will buy a bicycle today.</p>
+<p>In addition to regression we can also view logistic regression as a way of performing binary classification. This is done by taking the probability of an outcome predicted by linear regression and applying a threshold to it. In other words we create a classifier with the following rule:</p>
+<blockquote>
+<p>If \(p(y=1) >= \tau\) then predict \(x\) as being a member of the class \(y=1\) otherwise predict \(x\) as being a member of the other class \(y=0\). (In practice we would select \(\tau\) by leveraging a validation set.)</p>
+</blockquote>
+<h3 id="model">Model</h3>
+<p>Mathematically, logistic regression models the probability \(p\) of an outcome \(y=1\) as follows:</p>
+$$
+p(y=1) = \frac{1}{1 + e^{-(\vec{w} \cdot \vec{x})}}
+$$<p>Looking at this model you will notice we have a linear expression with weights \(\vec{w}\) being multiplied by the input features \(\vec{x}\). This product is then passed through the sigmoid function (which is also known as the logistic function). The role of the sigmoid function is to take any real valued number and transform it into a value between 0 and 1 which can be interpreted as a probability.</p>
+<p>As I alluded to earlier, I think of logistic regression as a relative/cousin of linear regression because it shares the linear term that is at the heart of <a href="https://breslav.github.io/reviewing-linear-regression/">linear regression</a>.</p>
+<blockquote>
+<p>Recall the linear term is: \(y = w_{0} + w_{1}x_{1} + w_{2}x_{2} + \cdots + w_{n}x_{n}\) or equivalently \(y = \vec{w} \cdot \vec{x}\).</p>
+</blockquote>
+<h4 id="log-odds-interpretation">Log Odds Interpretation</h4>
+<p>An alternative way to interpret logistic regression is that it is modeling the linear relationship between input features and the log odds of the binary outcome. We can see this mathematically as follows:</p>
+$$
+\begin{align}
+odds = \frac{p(y=1)}{1-p(y=1)} \\
+\log\;odds = \log\left(\frac{p(y=1)}{1-p(y=1)}\right) \\
+ = \log(p(y=1)) - \log(1-p(y=1)) \\
+ = -\log(1 + e^{-(\vec{w} \cdot \vec{x})}) - \log\left(\frac{e^{-(\vec{w} \cdot \vec{x})}}{1 + e^{-(\vec{w} \cdot \vec{x})}}\right) \\
+ = -\log(1 + e^{-(\vec{w} \cdot \vec{x})}) - \log(e^{-(\vec{w} \cdot \vec{x})}) + \log(1 + e^{-(\vec{w} \cdot \vec{x})}) \\
+ = - \log(e^{-(\vec{w} \cdot \vec{x})}) \\
+ = \vec{w} \cdot \vec{x} \\
+\end{align}
+$$<p>I find this interpretation of logistic regression harder to digest than that of linear regression. For one thing log odds might not be all that intuitive unless you like log and are a gambler.</p>
+<p>Let&rsquo;s try and make it less abstract. Odds comes up in betting and if two teams are equally favored to win then the odds ratio would be 1/1. If one team has a \(0.75\) probability of winning and the other team has a \(0.25\) probability of winning that would correspond to an odds ratio of 3/1. Ignoring log for now we have some notion that the probability of some binary outcome (e.g this team wins the game) is linear in the features. Presumably for sports we would have features like how winning the team is and we would expect the more winning it is the higher the odds (and log odds) of it winning are.</p>
+<h3 id="optimization">Optimization</h3>
+<p>Once again we have to ask the question: how do we train/fit the model on/to our data \(\{(\vec{x_{i}},y_{i})\}\), where \(y_{i}\) is the binary valued outcome. In order to fit or train the model we need to find the values of the parameters \(w\) that optimize some loss/objective. In logistic regression the commonly chosen objective is minimizing the cross-entropy loss (also referred to as the log loss). That is we want to find \(w\) that minimizes:</p>
+\[ Loss = -\sum_{i=1}^{m} \Bigl(y^{i}\;\log(p_{y^{i}=1}) + (1-y^{i})\;\log(1-p_{y^{i}=1})\Bigr) \]<p>
+Where \(m\) is the number of training data points we have.</p>
+<p>We can intuitively understand the loss by looking at what loss value is produced for the different combinations of true outcome and predicted probability.</p>
+<ul>
+<li>Label \(y=1\),  model probability \(p(y=1)=1\) &ndash;&gt; \(Loss= 0\)</li>
+<li>Label \(y=0\), model probability \(p(y=1)=0\) &ndash;&gt; \(Loss= 0\)</li>
+<li>Label \(y=1\), model probability \(p(y=1)=0\) &ndash;&gt; \(Loss=+\infty\)</li>
+<li>Label \(y=0\), model probability \(p(y=1)=1\) &ndash;&gt; \(Loss=+\infty\)</li>
+</ul>
+<p>In summary, as the predicted probability trends farther away from the label the loss shoots up towards positive infinity. As the predicted probability trends closer to the label the loss approaches 0. Hence we want to find parameters that minimize the loss on our dataset!</p>
+<h4 id="cross-entropy-from-mle">Cross Entropy From MLE</h4>
+<p>Another way to motivate the use of the cross-entropy loss is to view it as emerging from a maximum likelihood estimation (MLE) derivation. In particular for logistic regression we want to find the model parameters \(\theta\) that maximize this conditional likelihood term:</p>
+$$
+\begin{align}
+\underset{\theta}{\operatorname{argmax}} p(\vec{y}|\vec{x}) \\
+= \underset{\theta}{\operatorname{argmax}} \prod_{i=1}^{m} p(y_i|x_i) \\
+= \underset{\theta}{\operatorname{argmax}}\: \log\left(\prod_{i=1}^{m} p(y_i|x_i)\right) \\
+= \underset{\theta}{\operatorname{argmax}} \sum_{i=1}^{m} \log p(y_i|x_i) \\
+= \underset{\theta}{\operatorname{argmin}} -\sum_{i=1}^{m} \log p(y_i|x_i) \\
+= \underset{\theta}{\operatorname{argmin}} -\sum_{i=1}^{m} \log\left(p^{y_i}(1-p)^{1-y_i}\right) \\
+= \underset{\theta}{\operatorname{argmin}} -\sum_{i=1}^{m} \log\left(p^{y_i}\right) + \log\left((1-p)^{1-y_i}\right) \\
+= \underset{\theta}{\operatorname{argmin}} -\sum_{i=1}^{m} y^i\,\log(p) + (1-y^i)\,\log(1-p) \\
+\end{align}
+$$<p>Looking at the last term of this derivation we see that maximizing the likelihood is equivalent to minimizing the cross-entropy loss we introduced above. Here \(p\) represents the probability our logistic regression model assigns to the \(i\)-th data point being a member of the binary class we associated with \(y=1\).</p>
+<p>A few notes on the math:</p>
+<ul>
+<li>Usually maximum likelihood estimation (MLE) uses a likelihood term which is defined as the probability of observing our data given the class, e.g \(p(\vec{x}|\vec{y})\). However, in the case of logistic regression the common MLE derivation uses a different definition of likelihood which is referred to as a conditional likelihood. I don&rsquo;t yet fully understand why this definition is used, I think it may have to do with the fact that in this problem it&rsquo;s easier to model this conditional than the standard likelihood.</li>
+<li>The initial conditional probability is decomposed into a product over samples because we assume our data samples are independent.</li>
+<li>In this optimization we have a product of probabilities which are always positive and therefore we can transform our optimization with log without changing the solution.</li>
+<li>We turn a maximization objective into an equivalent minimization problem by adding a negative.</li>
+<li>We replace our conditional probability with the <a href="https://en.wikipedia.org/wiki/Bernoulli_distribution" target="_blank" rel="noopener">Bernoulli</a> distribution which models the probability of a particular binary outcome like obtaining a heads when flipping a coin. This makes sense since logistic regression is modeling the probability of some binary outcome which we can also think of as a coin toss. Some other derivations I&rsquo;ve encountered start w/ this substitution.</li>
+</ul>
+<h4 id="gradient-descent-solution">Gradient Descent Solution</h4>
+<p>Gradient descent is an extremely powerful tool and so perhaps unsurprisingly we once again look to gradient descent to help us find the parameters \(w\) that minimize the cross-entropy loss. In order to apply gradient descent we need the gradient of the loss with respect to the parameters.</p>
+<p>To help us with the calculation of the derivative let&rsquo;s first look at some intermediary results. We begin with the derivative of the sigmoid function which our loss depends on.</p>
+$$
+\begin{align}
+\sigma(z) = \frac{1}{1 + e^{-z}} \\
+\frac{\partial}{\partial z} \sigma(z) = \frac{(1 + e^{-z})0 - 1(-e^{-z})}{(1+e^{-z})^2} \\
+\frac{\partial}{\partial z} \sigma(z) = \frac{e^{-z}}{(1+e^{-z})^2} \\
+\frac{\partial}{\partial z} \sigma(z) = \frac{e^{-z}}{(1+e^{-z})} \frac{1}{1+e^{-z}} \\
+\frac{\partial}{\partial z} \sigma(z) = \frac{e^{-z}}{(1+e^{-z})} \sigma(z) \\
+\frac{\partial}{\partial z} \sigma(z) = (1-\sigma(z)) \sigma(z) \\
+\end{align}
+$$<p>Now let&rsquo;s redo the above using our linear expression \(w \cdot x\) plugged in for \(z\):</p>
+$$
+\begin{align}
+\sigma(w \cdot x) = \frac{1}{1 + e^{-w \cdot x}} \\
+\frac{\partial}{\partial w} \sigma(w \cdot x) = \frac{(1 + e^{- w \cdot x})0 - 1(-xe^{-w \cdot x})}{(1+e^{-w \cdot x})^2} \\
+\frac{\partial}{\partial w} \sigma(w \cdot x) = \frac{xe^{-w \cdot x}}{(1+e^{-w \cdot x})^2} \\
+\frac{\partial}{\partial w} \sigma(w \cdot x) = \frac{xe^{-w \cdot x}}{(1+e^{-w \cdot x})} \frac{1}{1+e^{-w \cdot x}} \\
+\frac{\partial}{\partial w} \sigma(w \cdot x) = \frac{xe^{-w \cdot x}}{(1+e^{-w \cdot x})} \sigma(w \cdot x) \\
+\frac{\partial}{\partial z} \sigma(w \cdot x) = x(1-\sigma(w \cdot x)) \sigma(w \cdot x) \\
+\end{align}
+$$<p>Now let&rsquo;s leverage the above gradient to help us with the derivation of the gradient of the cross-entropy loss.</p>
+$$
+\begin{align}
+Loss =  -\sum_{i=1}^{m} y^i\,\log(p) + (1-y^i)\,\log(1-p) \\
+Loss =  -\sum_{i=1}^{m} y^i\,\log(\sigma(w \cdot x)) + (1-y^i)\,\log(1-\sigma(w \cdot x)) \\
+\frac{\partial Loss}{\partial w} =  -\sum_{i=1}^{m}  \frac{\partial}{\partial w} \Bigl(y^i\,\log(\sigma(w \cdot x)) + (1-y^i)\,\log(1-\sigma(w \cdot x))\Bigr) \\
+\frac{\partial Loss}{\partial w} =  -\sum_{i=1}^{m}  \Bigl(y^i\,\frac{x(1-\sigma(w \cdot x)) \sigma(w \cdot x)}{\sigma(w \cdot x)}\Bigr) + \Bigl((1-y^i)\,\frac{-x(1-\sigma(w \cdot x)) \sigma(w \cdot x)}{(1-\sigma(w \cdot x))} \Bigr) \\
+\frac{\partial Loss}{\partial w} =  -\sum_{i=1}^{m}  \Bigl(y^i\,x(1-\sigma(w \cdot x))\Bigr) + \Bigl(-(1-y^i)\,x\sigma(w \cdot x) \Bigr) \\
+\frac{\partial Loss}{\partial w} =  -\sum_{i=1}^{m}  \Bigl(y^i\,x - y^i\,x\sigma(w \cdot x)\Bigr) + \Bigl(-\,x\sigma(w \cdot x) + y^i\,x\sigma(w \cdot x) \Bigr) \\
+\frac{\partial Loss}{\partial w} =  -\sum_{i=1}^{m}  \Bigl(y^i\,x  -\,x\sigma(w \cdot x)  \Bigr) \\
+\frac{\partial Loss}{\partial w} =  -\sum_{i=1}^{m}  x(y^i -\,\sigma(w \cdot x))
+\end{align}
+$$<p>As a sanity check, our derivation result matches the result from these Stanford <a href="https://web.stanford.edu/~jurafsky/slp3/5.pdf" target="_blank" rel="noopener">slides</a>. Hooray! Additionally, the gradient for an individual weight \(w_j\) would be the same as above but with the multiplier being \(x_j\). So semantically, the gradient depends on the difference between the true class (represented with a probability of 1 or 0) and the predicted probability of belonging to class 1. This difference is then scaled by the input \(x_j\).</p>
+<h3 id="other-nuances">Other Nuances</h3>
+<p>Like in our discussion of nuances in <a href="https://breslav.github.io/reviewing-linear-regression/#normalization">linear regression</a>, there are several things you want to keep in mind before applying logistic regression. Specifically, we still need to normalize our data and adding regularization is a good idea.</p>
+<h4 id="quality-of-fit">Quality of Fit</h4>
+<p>While there are some notions of evaluating the quality of the fit of the model from a regression point of view, the most practical way to evaluate a logistic regression model is through the lens of classification.</p>
+<p>Broadly speaking that means we would make predictions on some validation set and formulate a \(2 \times 2\) confusion matrix which can then be used to generate a variety of metrics like accuracy, precision, recall etc. We can also look at tradeoffs between metrics (like precision and recall) when we vary the threshold used for classification.</p>
+<h4 id="multinomial-logistic-regression">Multinomial Logistic Regression</h4>
+<p>Logistic regression can also be extended to the case of multiple classes which is known as multinomial logistic regression. In this case the model is predicting a proability distribution over more than two classes. As a result instead of a single weight vector \(w\) we would have a weight matrix \(W\) of \(k \times n\) dimensions, where \(k\) is the number of classes and \(n\) is the dimension of the input (plus 1 for a bias term). We then compute \(Wx\) which produces a \(k\) dimensional vector representing un-normalized scores for each class.</p>
+<p>These un-normalized scores (also referred to as logits) are fed through the softmax function in order to get a probability distribution (probabilities sum to 1).</p>
+$$
+softmax(y_i) = \frac{e^{y_i}}{\sum_{i=1}^{k} e^{y_i}}
+$$<p>If \(y_i\) is the un-normalized score for class \(i\) then the softmax function converts it to a probability value. <strong>Note:</strong> Regardless of whether the un-normalized score is positive or negative if we exponentiate it, we will get a positive value. Since the denominator is just a sum of the numerators for each class we are left with a probability distribution in the end.</p>
+<p>As with logistic regression, multinomial logistic regression also uses the cross-entropy loss in optimization. The cross-entropy loss generalized to \(k\) classes is as follows:</p>
+$$
+Loss =  -\sum_{i=1}^{m} \sum_{j=1}^{k} y_j^i\,\log(p_j) \\
+$$<p>Notice that for any particular data point \(y_j\) will be 1 when \(j\) matches the class of the label and 0 otherwise. Therefore the loss for \(y_j\) only depends on the log of the probability predicted for that same class. Once again the closer this probability is to 1 the closer the loss is to 0 and the closer this probability is to 0 the closer the loss approaches positive infinity.</p>
+<p>We can also notice that our ordinary cross-entropy loss for the binary case is just a special case of this loss where \(k=2\).</p>
+<h4 id="conclusion">Conclusion</h4>
+<p>Logistic regression is not only a classic ML (and stats) model but it is also one of the first models to try when working on a binary classification problem. Additionally, a lot of the ingredients in logistic regression (cross-entropy loss, gradient descent, linear combinations of features) show up in neural networks which means learning about logistic regression can help you to understand neural networks.</p>
+<p>Finally, we see that scikit has the following <a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html" target="_blank" rel="noopener">API</a> for logistic regression. As an aside it looks like scikit implements alternative optimization algorithms that don&rsquo;t include gradient descent. The default is <a href="https://en.wikipedia.org/wiki/Limited-memory_BFGS" target="_blank" rel="noopener">L-BFGS</a> which is a quasi-Newton method that appears to converge faster than gradient descent. The API also defaults to using L2 regularization.</p>
+<h4 id="references">References</h4>
+<p>A few misc references that I consulted in addition to all the ones linked above:</p>
+<ul>
+<li><a href="https://web.stanford.edu/~jurafsky/slp3/5.pdf" target="_blank" rel="noopener">CMU Lecture Slides</a></li>
+</ul>
+
+</content>
+<p>
+  
+</p>
+
+  </main>
+  <footer><small>
+  Copyright &copy; 2025 Mikhail Breslav 
+</small></footer>
+
+    
+</body>
+
+</html>
