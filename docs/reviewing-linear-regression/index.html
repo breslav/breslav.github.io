@@ -43,7 +43,7 @@ Core Linear regression models the relationship between some dependent variable \
 Core Linear regression models the relationship between some dependent variable \(y\) and independent variable \(x\) as being linear. With a single independent variable it is commonly expressed as: \(y = wx &#43; b\) or equivalently \(y = w_{0} &#43; w_{1}x\). In multiple linear regression where we have multiple independent variables it can be expressed as: \(y = w_{0} &#43; w_{1}x_{1} &#43; w_{2}x_{2} &#43; \cdots &#43; w_{n}x_{n}\) which in vector notation is \(y = \vec{w} \cdot \vec{x}\).">
   <meta itemprop="datePublished" content="2025-03-02T00:00:00+00:00">
   <meta itemprop="dateModified" content="2025-03-02T00:00:00+00:00">
-  <meta itemprop="wordCount" content="2071">
+  <meta itemprop="wordCount" content="2068">
   <meta itemprop="image" content="https://breslav.github.io/images/share.png">
 <meta name="referrer" content="no-referrer-when-downgrade" />
 
@@ -290,7 +290,7 @@ $$<p>In this case we can use linear regression to fit an nth order polynomial to
 <p>While linear regression is considered to be one of the simplest kinds of machine learning models we see it is anything but simple. In this post I&rsquo;ve presented what linear regression is, what loss is being optimized, how the optimization is performed and some of the nuances to be aware of before applying it in practice.</p>
 <p>Largely, I have focused on linear regression through the lens of ML but I wanted to mention that there are also various statistical framings of linear regression. In my opinion the statistical view is more difficult to understand. One connection between the two views that I wanted to point out is that if you <a href="https://statproofbook.github.io/P/slr-mle.html" target="_blank" rel="noopener">work out</a> the maximum likelihood estimate for linear regression you end up with a term in the maximization that is identical to the sum of squared errors loss (within a constant factor)!</p>
 <p>If you&rsquo;re looking for a good starting point to play with linear regression consider the scikit library. The library documenation shows how to use <a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html" target="_blank" rel="noopener">linear regression</a> and also points to linear regression functions that incorporate the different kinds of <a href="#regularization">regularization</a> we discussed.</p>
-<p>Stay tuned for a follow up post on logistic regression which is the cousin of linear regression.</p>
+<p>Update! Checkout my follow up post on <a href="https://breslav.github.io/reviewing-logistic-regression/">logistic regression</a> (the cousin to linear regression)!</p>
 <h4 id="references">References</h4>
 <p>A few misc references that I consulted in addition to all the ones linked above:</p>
 <ul>
