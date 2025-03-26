@@ -7,8 +7,15 @@
     <generator>Hugo</generator>
     <language>en-US</language>
     <copyright>Copyright © 2025, Mikhail Breslav.....</copyright>
-    <lastBuildDate>Mon, 10 Mar 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 24 Mar 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://breslav.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Reviewing Decision Trees</title>
+      <link>https://breslav.github.io/reviewing-decision-trees/</link>
+      <pubDate>Mon, 24 Mar 2025 00:00:00 +0000</pubDate>
+      <guid>https://breslav.github.io/reviewing-decision-trees/</guid>
+      <description>&lt;p&gt;Decision Trees (and their ensemble counterparts) form another class of fundamental ML models and in this blog post I&amp;rsquo;d like to briefly review some of the key concepts behind them.&lt;/p&gt;&#xA;&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;&#xA;&lt;p&gt;The simplest way to think of a decision tree is that it is a tree which applies rules to an input and subsequently generates predictions that can be applied to both regression and classification problems.&lt;/p&gt;&#xA;&lt;p&gt;When we make a prediction with a single decision tree on a test sample \(\vec{x}\), we start by answering a sequence of questions about individual feature values of \(\vec{x}\). These questions can be:&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Reviewing Logistic Regression</title>
       <link>https://breslav.github.io/reviewing-logistic-regression/</link>
