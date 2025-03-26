@@ -1,43 +1,46 @@
 ---
 date: "2025-03-24T00:00:00Z"
 tags:
-title: Reviewing Decision Tree Models 
+title: Reviewing Decision Trees 
 ---
 
-Decision Trees (and their counterparts) form another class of fundamental ML models and in this blog post I'd like to briefly review some of the key concepts behind them. 
+Decision Trees (and their ensemble counterparts) form another class of fundamental ML models and in this blog post I'd like to briefly review some of the key concepts behind them. 
 
-### Introduction 
-The simplest way to think of a decision tree is that it is a tree of rules which can be used to make predictions both numerical (like in the case of regression) and categorical (like in the case of classification). 
+## Introduction 
+The simplest way to think of a decision tree is that it is a tree which applies rules to an input and subsequently generates predictions that can be applied to both regression and classification problems. 
 
-When we make a prediction with a single decision tree on a test point, we start by taking our input features \(x\) and answering a sequence of questions about \(x\). These questions can be:
+When we make a prediction with a single decision tree on a test sample \(\vec{x}\), we start by answering a sequence of questions about individual feature values of \(\vec{x}\). These questions can be:
 - Is the numeric feature \(x_i\) >= \(3.2\)?
 - Is the categorical feature \(x_j\) == Sunny?
 - Is the ordinal feature \(x_k\) < 3 Stars?
 
-As each question in the tree is answered we traverse down the tree until the last question which brings us to some leaf node. We can think of the leaf node as corresponding to the subset of training data whose features also have the same answers to these questions. 
+As each question in the tree is answered we traverse down the tree until reaching a leaf node. We can think of the leaf node as corresponding to the subset of training data whose features also have the same answers to these questions. 
 
-In other words we have placed our test datapoint into the same bucket as a bunch of training data points and we then make a prediction about our test point by aggregating the labels of the training points in this bucket (strong K-NN vibes). If we are performing classification we may use majority voting for aggregation and if we are performing regression we may use averaging for aggregation.  
+In other words, we have placed our test sample into the same bucket as a bunch of training samples and we then make a prediction about our test sample by aggregating the labels of the training samples in this bucket (gives off some K-NN vibes). If we are performing classification we may use majority voting for aggregation and if we are performing regression we may use averaging for aggregation.  
 
-#### Example
-Let's take a look at a classification example where we want to classify iris flowers (a classic toy [dataset](https://archive.ics.uci.edu/dataset/53/iris)) as one of 3 classes. Our training set consists of 150 data points each containing 4 features (sepal length, sepal width, petal length, petal width). The decision tree that was generated for this problem is shown below (more on how it is generated later). 
+#### Concrete Example
+Let's take a look at a concrete example where a decision tree has been trained for the problem of classifying [iris plants](https://archive.ics.uci.edu/dataset/53/iris). 
+The training set consists of 150 samples each having 4 features (sepal length, sepal width, petal length, petal width) and a classification indicating which of 3 plant types the plant is (Setosa, Versicolour, Virginica). The decision tree that was learned for this problem is shown below (more on how it is generated later). 
 
-We see that the root of the tree asks whether the petal length is less than or equal to \(2.45\). If our input answers this question as yes (True) then we proceed to the left otherwise to the right (False). In this tree the left node is a leaf node and if you land there then using the majority vote scheme you would predict the class as being class 0 (setosa). If we land in the right node then we have another question to answer which is whether the petal width is less than or equal to \(1.75\). Based on the answer to that question we would proceed until we land on a leaf node where we would make our prediction. 
+We see that the root of the tree asks whether the petal length is less than or equal to \(2.45\). If our test sample answers this question as yes (True) then we proceed to the left child otherwise to the right child (False). In this tree the left child is a leaf node and if you land there then using the majority vote scheme you would predict the class as being class 0 (Setosa). If we land in the right child then we have another question to answer which is whether the petal width is less than or equal to \(1.75\). Based on the answer to that question we would proceed down the tree until landing on a leaf node where we would make our prediction. 
 
-{{< imgproc iris_dt Resize "900x" "Example Decision Tree" >}} Example Decision Tree. (From scikit-learn docs.) {{< /imgproc >}}
+{{< imgproc iris_dt Resize "900x" "Example Decision Tree" >}} Decision Tree for Classifying Iris Plants. (From scikit-learn docs.) {{< /imgproc >}}
 
-### Training
-At this point an obvious question emerges:
+## Training
+At this point we have seen how you can use a decision tree to make a prediction. This leads to the obvious follow up question:
 > How is a decision tree constructed (or learned) and what is it optimizing? 
 
 Conceptually, we want a decision tree to ask questions that split the training data in such a way that leaf nodes are relatively "pure". We can think of purity in the classification context as meaning a leaf node contains training samples that are predominantly of the same class (the closer to one class the more pure). In the regression context, purity would mean a leaf node contains training samples whose labels (target values) are similar to each other (the more similar the more pure). 
 
-Intuitively, if a decision tree has splits that lead to relatively pure leaf nodes, then we can argue the tree has learned patterns in feature space which can be used to discriminate between different classes or target values. This means purity helps us produce a discriminative model that can be used for classification and regression. 
+Why do we want purity? Intuitively, if a decision tree has relatively pure leaf nodes, then we can argue the tree has learned patterns in feature space that are effective at discriminating between different classes or target values. Alternatively, consider a leaf node that is very impure, this would mean it contain samples that have very different semantics in which case we would argue the model hasn't learned how to discriminate effectively and thus will not be useful for prediction. 
 
-#### Measuring Split Purity 
-When we build a decision tree we end up specifying a tree of splits. When a split is applied to a node we get children nodes whose purity we would like to measure. 
-This means we need a measure of purity (or impurity) to understand whether our split is leading us towards pure leaf nodes.
+### Measuring Split Purity 
+When we actually train a decision tree, we will be evaluating splits (the questions posed by the tree). A split will be considered good if it produces children nodes that are relatively pure (compared to the parent). This brings us to the question: 
 
-For **classification**, Gini impurity and Entropy are two of the most common measures of purity. 
+> How do we measure the purity of some node?
+
+#### Classification
+For classification, Gini impurity and Entropy are two of the most common measures of purity. 
 
 The Gini impurity score (opposite of purity) is given by:
 
@@ -59,7 +62,8 @@ $$
 
 Here once again \(k\) denotes the number of different classes spanned by the samples in the node, and \(p_i\) is the proportion of samples that belong to class \(i\). We can see that if all samples are of the same class then the proportion for that class becomes 1 while all others become 0 leading to an entropy of 0 (the most pure). Alternatively, if we had say \(2\) classes and the samples were evenly split we would have an entropy of \(-\frac{1}{2} \log(\frac{1}{2}) - \frac{1}{2} \log(\frac{1}{2}) = 1 \), indicating not pure. 
 
-For **regression**, a common way to measure purity is to use mean squared error (MSE). In this case we assume that a node will make a prediction (\(\hat{y}\)) that is equal to the mean target value of the \(n\) samples in the node. The MSE of a given node is given by:
+#### Regression
+For regression, a common way to measure purity is to use mean squared error (MSE). In this case we assume that a node will make a prediction (\(\hat{y}\)) that is equal to the mean target value of the \(n\) samples in the node. The MSE of a given node is given by:
 
 
 $$
@@ -70,26 +74,25 @@ $$
 
 We can see when all samples in a node contain the same target value then the MSE will be 0. As the samples deviate farther and farther from each other (and thus the mean) the MSE will go up. Note in this case MSE is equivalent to the variance of the target values.
 
-#### Optimization
-So far we have touched on one property we would like in an ideal decision tree, namely relatively pure leaf nodes. On the other hand we may be able to achieve this by creating a very large and complicated tree. This leads us to a second property we would like in an ideal decision tree which is that it has a relatively small size.
 
-Unfortunately, finding the global optimal tree is known to be an NP-hard problem. It's not computationally feasible to try all permutations of feature splits where the feature splits themselves depend on both the number of features and the range of values they can take on. 
+### Optimization
+So far we have characterized an optimal decision tree as one having relatively pure leaf nodes. It turns out that finding the most optimal tree (one that leads to the purest leaf nodes) is an NP-hard problem. It would require us to try all permutations of feature splits where the feature splits themselves depend on both the number of features and the range of values they can take on. 
 
 In practice decision trees are grown (trained) using greedy algorithms. The general flow of these greedy algorithms is as follows:
-- First initialize the root node of a tree by selecting the single split that provides the largest increase in purity (equivalently largest decrease in impurity) between root and the resulting children. 
-  - The purity of the children can be evaluated by summing their individual purities weighted by the proportion of samples that belong to each child. 
+1. Initialize the root node of a tree by selecting the single split that provides the largest increase in purity (equivalently largest decrease in impurity) between root and the resulting children.  
+    * The joint purity of the children can be evaluated by summing their individual purities weighted by the proportion of samples that belong to each child. 
 
-- Next select a new split for each child that provides the largest increase in purity (or decrease in impurity) between child and grandchildren.
-- Repeat the previous step recursively until either some stopping criteria is reached or no further split can be found to increase purity. 
+2. Next select a new split for each child that provides the largest increase in purity (or decrease in impurity) between it and it's children.
+
+3. Repeat the previous step (2) recursively until some stopping criteria is met or no further split can be found to increase purity. 
 
 The time complexity of the greedy algorithm is roughly \(O(mn\log(n))\) where \(n\) is the number of training samples and \(m\) is the number of features. Some nuances on this time complexity are discussed [here](https://sebastianraschka.com/pdf/lecture-notes/stat451fs20/06-trees__notes.pdf).
 
-It's worth noting that there are a variety of decision tree algorithms and some of the most popular ones are ID3, C4.5, and CART. In general these different algorithms can vary in what kind of splitting measure they use, whether the splits are binary or n-ary, and how they perform pruning (see next section).
+In practice there are a wide variety of decision tree training algorithms and some of the most popular ones are [ID3](https://en.wikipedia.org/wiki/ID3_algorithm), [C4.5](https://en.wikipedia.org/wiki/C4.5_algorithm), and [CART](https://en.wikipedia.org/wiki/Decision_tree_learning) (comparison of them [here](https://sebastianraschka.com/pdf/lecture-notes/stat451fs20/06-trees__notes.pdf)). In general these different algorithms can vary in what kind of splitting measure they use, whether the splits are binary or n-ary, and how they perform pruning (see next section).
 
+### Regularization
 
-#### Regularization
-
-One challenge with decision trees is that if you allow them to keep growing in size they can easily overfit to the training data. There are several regularization techniques to reduce the freedom and complexity of a decision tree. These include:
+One challenge with decision trees is that if you allow them to keep growing in size they can easily overfit to the training data. Therefore we look to several common regularization techniques that help reduce the freedom and complexity of the decision tree. These include:
 - Limiting the maximum depth of the tree. (Very common.)
 - Limiting the number of features being evaluated for each split.
 - Limiting the number of leaf nodes.
@@ -99,43 +102,54 @@ One challenge with decision trees is that if you allow them to keep growing in s
 We can also think of these limits as forms of pre-pruning (proactively preventing the growth of the tree). There are also post-pruning techniques where you allow the tree to first grow without restriction and then afterwards nodes are pruned.
 
 
-### Pros and Cons 
+## Pros and Cons {#prosandcons} 
 There are several pros and cons to consider before applying decision trees to your problem.
 
-- Pro: Decision trees are interpretable. For any particular leaf node you can find the path from the root to it and this path represents a sequence of questions and answers (rules) that lead to a certain prediction. Interpretability is really important in some domains.
+#### Pros:
+- One of the biggest pros is that decision trees are interpretable. For any particular leaf node you can find the path from the root to it and this path represents a sequence of interpretable questions and answers (rules) that led to a certain prediction. Interpretability is really important in many domains including healthcare, criminal justice, and autonomous systems.
 
-- Pro: Decision trees can provide a notion of feature importance. That is we can look at how much purity was gained when splitting on a particular feature and use this as a signal of which features are most important.
+- Decision trees can provide insight into feature importance. That is we can look at how much purity was gained when splitting on a particular feature and use this as a signal of which features are most important. This again gets back to the idea that features that can help discriminate between classes/labels are more important than those that do not. 
 
-- Pro: Decision trees can happily work with mixed data types. 
-- Pro: You don't need to worry about scaling/normalizing input features.
+- Decision trees can happily work with mixed data types. 
+- You don't need to worry about scaling/normalizing input features.
+- Decision trees are relatively robust to missing feature values (e.g when growing a tree samples with a missing feature value can be ignored).
 
-- Con: Decision trees by nature make splits that are orthogonal to the axes (e.g \(x < 3\) or \(y > 5\)) which means that the results of a decision tree can be sensitive to the orientation of the data. If some decision boundary is not axis aligned then it will be harder to model it cleanly with a decision tree. Rotating your data with PCA may help with this problem but there is no guarantee. 
+#### Cons:
+- Decision trees by nature make splits that are orthogonal to the axes (e.g \(x < 3\) or \(y > 5\)) which means that the results of a decision tree can be sensitive to the orientation of the data. If some decision boundary is not axis aligned (e.g a diagonal one) then it will be harder to model it cleanly and will generally require a larger decision tree. Rotating your data with PCA may help with this problem but there is no guarantee. 
 
-- Con: Decision trees are prone to overfitting. This means small changes to the training data (or hyperparameters) can lead to very different models. We will see that ensemble models can help to reduce the variance of the model.
+- Decision trees are very prone to overfitting. This means small changes to the training data (or hyperparameters) can lead to very different models. We will see that ensemble models can help to reduce the variance of the model.
 
 
-### Ensemble Learning
+## Ensemble Learning
+In ML there is a powerful concept where you can often come up with a better performing model by aggregating the predictions from multiple different models. This general concept is known as ensemble learning and can be informally thought of as "the wisdom of the crowd" (not necessarily the most intuitive). 
 
-In ML we can often come up with a better predictor by aggregating the predictions of many different models. This general concept is known as ensemble learning and can be informally thought of "the wisdom of the crowd" (not necessarily the most intuitive). 
+In this section I will give an extremely brief overview of a few popular approaches for ensembling decision trees. 
 
-Given that decision trees can be prone to overfitting, creating ensembles of decision trees is one way to get better performance and reduce model variance. The most popular method of ensembling decision trees is called random forests.
+### Random Forests (Bagging)
+Some of the most successful applications of decision trees have been in the form of ensembles. Ensembles of decision trees can lead to better performance and reduce model variance. One of the most popular methods of ensembling decision trees is called [random forests](https://harvard-iacs.github.io/2021-CS109A/lectures/lecture18/presentation/RF.pdf).
 
 In general, random forests use two strategies for creating an ensemble of different decision trees: 
 - The first is that each decision tree is trained using a different subset of training data. The subset of training data is usually generated by sampling with replacement and leads to a diversity of trees since they each model different datasets. This overall approach is known as bagging (short for bootstrap aggregating).
 - Additionally, when growing the decision trees, each tree will only consider a random subset of features when determining the best splits. This further helps to decorrelate the different trees since they will make predictions based on different features.
 
-Another popular way to ensemble decision trees is to construct decision trees sequentially so that later trees can learn to correct the mistakes of previous trees. This strategy is broadly known as boosting with two of the most popular methods being AdaBoost and gradient boosting.
+One advantage of this kind of ensembling technique is that it lends itself well to parallelization. Each tree in the ensemble can be trained independently!
 
-At a very high level AdaBoost creates an ensemble of trees by identifying which training samples were misclassified (or had a large residual in the regression context) and increasing the weight of those samples so that they become more influential in the construction of the next tree (e.g the optimal split is influenced more by those samples).
+### AdaBoost and Gradient Boosting
+Another popular way to ensemble decision trees is to construct them sequentially so that later trees can learn to correct the mistakes of previous trees. This strategy is broadly known as boosting with two of the most popular methods being AdaBoost and gradient boosting (e.g [XGBoost](https://xgboost.readthedocs.io/en/stable/tutorials/model.html)).
 
-Like AdaBoost, gradient boosting creates a sequence of decision trees but instead of changing the weights of training samples, the objective is instead to have subsequent trees fit the errors of their predeceessors directly.
+At a very high level AdaBoost creates an ensemble of trees by identifying which training samples were misclassified (or had a large error in the regression context) and increasing the weight of those samples so that they become more influential in the construction of the next tree (e.g the optimal split is influenced more by those samples).
 
-There is a lot more depth to these various flavors of decision tree ensembles that are beyond the scope of this blog post. Gradient boosting in particular is still a relatively state of the art technique when it comes to prediction tasks associated with tabular data. 
+Like AdaBoost, gradient boosting creates a sequence of decision trees but instead of changing the weights of training samples, the objective is instead to have subsequent trees fit the errors of their predecessors directly. Gradient boosting has shown to still be state of the art for many prediction tasks on tabular data.
 
-An interesting question that also arises with respect to ensembles of decision trees is how does that impact the interpretability. It turns out we can still assess feature importance from the learned trees. Additionally, there are methods like [Shapley values](https://shap.readthedocs.io/en/latest/example_notebooks/overviews/An%20introduction%20to%20explainable%20AI%20with%20Shapley%20values.html) that we can leverage.
+## Conclusion
+In this blog post we've looked at the fundamentals of decision trees which are fairly distinct from other classic models like [linear regression]({{< ref "/blog/2025-03-03-lr" >}} ""), [logistic regression]({{< ref "/blog/2025-03-10-logr" >}} ""), and neural networks.
+
+Decision trees have many advantages as we [discussed](#prosandcons), but need to be constrained to avoid overfitting. They are a popular choice for base model in ensembles which are often the go to model when working with tabular data. There is a lot more depth behind the various ensembles we touched on which cannot be covered in this post. For additional reading I'd recommend diving into gradient boosted trees. 
+
+
+<!-- An interesting question that also arises with respect to ensembles of decision trees is how does that impact the interpretability. It turns out we can still assess feature importance from the learned trees. Additionally, there are methods like [Shapley values](https://shap.readthedocs.io/en/latest/example_notebooks/overviews/An%20introduction%20to%20explainable%20AI%20with%20Shapley%20values.html) that we can leverage. -->
 
 <!-- To make a prediction you apply the decision rules in a particular order on some input data and use the training data points that fall under the same leaf node to make a prediction. -->
-
 
 <!-- ### Introduction 
 The simplest way to think of a decision tree is that it is a model that encodes a hierarchy of decision rules which can be applied to either regression or classification problems.  Decision trees are also often used as a building block in ensemble models like random forests and gradient boosted trees.
@@ -146,11 +160,3 @@ It's also worth noting that decision tree based models are very different from o
 - Decision trees don't make an underlying assumption about the relationship between input features and output. 
 - Decision trees are not defined by a fixed number of model parameters (e.g they are non-parametric). 
 - Decision trees are not trained via gradient-based optimization algorithms.  -->
-
-
-
-
-#### Conclusion
-
-#### References
-A few misc references that I consulted in addition to all the ones linked above:
