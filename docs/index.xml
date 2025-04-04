@@ -7,8 +7,15 @@
     <generator>Hugo</generator>
     <language>en-US</language>
     <copyright>Copyright © 2025, Mikhail Breslav.....</copyright>
-    <lastBuildDate>Mon, 24 Mar 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 02 Apr 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://breslav.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bias and Variance</title>
+      <link>https://breslav.github.io/bias-and-variance/</link>
+      <pubDate>Wed, 02 Apr 2025 00:00:00 +0000</pubDate>
+      <guid>https://breslav.github.io/bias-and-variance/</guid>
+      <description>&lt;p&gt;One way to view different ML models is through the lens of &lt;a href=&#34;https://en.wikipedia.org/wiki/Bias%e2%80%93variance_tradeoff&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;bias and variance&lt;/a&gt;. In this blog post I want to summarize the concepts of bias and variance and address several questions I had after writing about &lt;a href=&#34;https://breslav.github.io/reviewing-decision-trees/&#34;&gt;decision trees&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;h2 id=&#34;concepts&#34;&gt;Concepts&lt;/h2&gt;&#xA;&lt;p&gt;At a high level bias and variance are two attributes of a model that influence the errors the model will make on unseen data.&lt;/p&gt;&#xA;&lt;p&gt;We will start by definining bias and variance at a conceptual level and then we will look at some math that details how each contribute to the expected error a model will make on unseen data.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Reviewing Decision Trees</title>
       <link>https://breslav.github.io/reviewing-decision-trees/</link>
