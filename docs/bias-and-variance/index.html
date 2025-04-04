@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0" />
+<link rel="shortcut icon" href="https://breslav.github.io/images/favicon-32x32.png" />
+<title>Bias and Variance | Mikhail Breslav</title>
+<meta name="title" content="Bias and Variance" />
+<meta name="description" content="One way to view different ML models is through the lens of bias and variance. In this blog post I want to summarize the concepts of bias and variance and address several questions I had after writing about decision trees.
+Concepts
+At a high level bias and variance are two attributes of a model that influence the errors the model will make on unseen data.
+We will start by definining bias and variance at a conceptual level and then we will look at some math that details how each contribute to the expected error a model will make on unseen data." />
+<meta name="keywords" content="" />
+
+
+<meta property="og:url" content="https://breslav.github.io/bias-and-variance/">
+  <meta property="og:site_name" content="Mikhail Breslav">
+  <meta property="og:title" content="Bias and Variance">
+  <meta property="og:description" content="One way to view different ML models is through the lens of bias and variance. In this blog post I want to summarize the concepts of bias and variance and address several questions I had after writing about decision trees.
+Concepts At a high level bias and variance are two attributes of a model that influence the errors the model will make on unseen data.
+We will start by definining bias and variance at a conceptual level and then we will look at some math that details how each contribute to the expected error a model will make on unseen data.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2025-04-02T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-04-02T00:00:00+00:00">
+    <meta property="og:image" content="https://breslav.github.io/images/share.png">
+
+
+
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://breslav.github.io/images/share.png">
+  <meta name="twitter:title" content="Bias and Variance">
+  <meta name="twitter:description" content="One way to view different ML models is through the lens of bias and variance. In this blog post I want to summarize the concepts of bias and variance and address several questions I had after writing about decision trees.
+Concepts At a high level bias and variance are two attributes of a model that influence the errors the model will make on unseen data.
+We will start by definining bias and variance at a conceptual level and then we will look at some math that details how each contribute to the expected error a model will make on unseen data.">
+
+
+
+
+  <meta itemprop="name" content="Bias and Variance">
+  <meta itemprop="description" content="One way to view different ML models is through the lens of bias and variance. In this blog post I want to summarize the concepts of bias and variance and address several questions I had after writing about decision trees.
+Concepts At a high level bias and variance are two attributes of a model that influence the errors the model will make on unseen data.
+We will start by definining bias and variance at a conceptual level and then we will look at some math that details how each contribute to the expected error a model will make on unseen data.">
+  <meta itemprop="datePublished" content="2025-04-02T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2025-04-02T00:00:00+00:00">
+  <meta itemprop="wordCount" content="1532">
+  <meta itemprop="image" content="https://breslav.github.io/images/share.png">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  body {
+    font-family: Verdana, sans-serif;
+    margin: auto;
+    padding: 20px;
+    max-width: 720px;
+    text-align: left;
+    background-color: white;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: #444;
+  }
+
+  figure {
+    float: left;
+    margin-top: 0.2cm;
+    margin-left: auto;
+    margin-right: 0.5cm;
+  }
+
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  b {
+    color: #222;
+  }
+
+  a {
+    color: #3273dc;
+  }
+
+  .title {
+    text-decoration: none;
+    border: 0;
+  }
+
+  .title span {
+    font-weight: 400;
+  }
+
+  nav a {
+    margin-right: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+
+  content {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    padding: 2px 5px;
+    background-color: #eee;
+  }
+
+  pre code {
+    border-left: 1px solid #999;
+    color: #555;
+    display: block;
+    padding: 10px;
+    white-space: pre-wrap;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: #555;
+    padding-left: 10px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px;
+    text-align: center;
+  }
+
+  .helptext {
+    color: #777;
+    font-size: small;
+  }
+
+  .errorlist {
+    color: #eba613;
+    font-size: small;
+  }
+
+  h4 {
+    margin-bottom: -0.25cm;
+}
+</style>
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-ND7MED44L2"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-ND7MED44L2');
+        }
+      </script>
+
+  
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],  
+      inlineMath: [['\\(', '\\)']]                  
+    }
+  };
+</script>
+  
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>Mikhail Breslav</h2>
+</a>
+<nav><a href="/">Home</a>
+
+<a href="/cv/">CV</a>
+
+<a href="/blog">Blog</a>
+</nav>
+</header>
+  <main>
+
+<h1>Bias and Variance</h1>
+<p>
+  <i>
+    <time datetime='2025-04-02' pubdate>
+      02 Apr, 2025
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>One way to view different ML models is through the lens of <a href="https://en.wikipedia.org/wiki/Bias%e2%80%93variance_tradeoff" target="_blank" rel="noopener">bias and variance</a>. In this blog post I want to summarize the concepts of bias and variance and address several questions I had after writing about <a href="https://breslav.github.io/reviewing-decision-trees/">decision trees</a>.</p>
+<h2 id="concepts">Concepts</h2>
+<p>At a high level bias and variance are two attributes of a model that influence the errors the model will make on unseen data.</p>
+<p>We will start by definining bias and variance at a conceptual level and then we will look at some math that details how each contribute to the expected error a model will make on unseen data.</p>
+<h3 id="bias">Bias</h3>
+<p>The bias of a model can be thought of in terms of how well the model&rsquo;s assumptions match the underlying function that generated the data (which is unknown to us).</p>
+<p>If for example we have data generated by a sinusoidal function like \(y=sin(x)\) and we fit the linear model \(\hat{y}=w_0x+w_1\) to it, we would say our model has a high bias as it makes assumptions that don&rsquo;t match the underlying function that generated the data. High bias is synonymous with underfitting and we would expect such a model to make erroneous predictions.</p>
+<p>If on the other hand we chose a model that was a sinusoid (with the right frequency), then we would say our model has low bias. Low bias would tell us we have a model that generally fits the data well.</p>
+<h3 id="variance">Variance</h3>
+<p>Variance is a little bit trickier to think about it. We can think of variance as measuring how sensitive a model is to small changes in the training data. High variance is synonymous with a model that overfits to the training data. Overfitting means the model begins to fit to noise contained in the training set. We would expect a model with high variance to also make erroneous predictions on unseen data.</p>
+<h2 id="mathematical-definitions-and-decomposition">Mathematical Definitions and Decomposition</h2>
+<p>Now let&rsquo;s look at the mathematical definitions of bias and variance for which we need to introduce a thought experiment:</p>
+<ul>
+<li>Suppose we have \(N\) different training sets each randomly sampling from a broader training set (e.g via bootstrapping).</li>
+<li>Suppose we then train a regression model on each of the \(N\) training sets, yielding \(N\) models.</li>
+<li>Suppose we then use each model to make a prediction for some data point \(x\), yielding predictions \(\{\hat{f_1}(x),\hat{f_2}(x),\cdots,\hat{f_{k}(x)}\}\).</li>
+<li>Now think of our model \(\hat{f}\) as a random variable that can make different predictions due to the underlying training data used to train it.</li>
+</ul>
+<p>Now we are ready to define bias and variance mathematically.</p>
+<h3 id="bias-1">Bias</h3>
+<p>Bias is defined as the difference between the expected model prediction and the ground truth value \(f(x)\). Notice that even if the predictions are all over the place, so long as their mean is close to \(f(x)\) the bias will be low.</p>
+$$
+Bias(\hat{f}(x)) = \mathbb{E}\big[\hat{f}(x)\big] - f(x) \\
+$$<h3 id="variance-1">Variance</h3>
+<p>Variance is defined by looking at the square of how much the predictions deviate from the mean prediction, and then taking the mean across different predictions. The higher the variance the more wildly the predictions will vary from one training set to another.</p>
+$$
+Var(\hat{f}(x)) = \mathbb{E}\big[ (\hat{f}(x)-\mathbb{E}[\hat{f}(x)])^2\big] 
+$$<h3 id="decomposition">Decomposition</h3>
+<p>The most common way that bias and variance are presented mathematically is by showing how they each contribute to the MSE (regression context), which represents the model&rsquo;s expected prediction error.
+In other words the MSE considers all possible predictions we could make and tells us how big the squared error would be in expectation.</p>
+$$
+MSE(x) = \mathbb{E}\big[ (f(x) - \hat{f}(x))^2 \big] \\
+$$<p>If we expand out the definition for MSE we get the following:</p>
+$$
+\begin{align}
+= \mathbb{E}\big[ (f(x)^2 - 2\hat{f}(x)f(x) + \hat{f}(x)^2 \big] \\
+= \mathbb{E}\big[ f(x)^2 \big] - 2\mathbb{E}\big[\hat{f}(x)f(x)\big] + \mathbb{E}\big[\hat{f}(x)^2 \big] \\
+= f(x)^2 - 2f(x)\mathbb{E}\big[\hat{f}(x)\big] + \mathbb{E}\big[\hat{f}(x)^2 \big] \\
+= f(x)^2 - 2f(x)\mathbb{E}\big[\hat{f}(x)\big] + \mathbb{E}\big[\hat{f}(x)^2 \big] - \mathbb{E}\big[\hat{f}(x)\big]^2 + \mathbb{E}\big[\hat{f}(x)\big]^2\\
+= f(x)^2 - 2f(x)\mathbb{E}\big[\hat{f}(x)\big] + \mathbb{E}\big[\hat{f}(x)\big]^2 + \mathbb{E}\big[\hat{f}(x)^2 \big] - \mathbb{E}\big[\hat{f}(x)\big]^2 \\
+= (\mathbb{E}\big[\hat{f}(x)\big] - f(x))^2 + \mathbb{E}\big[\hat{f}(x)^2 \big] - \mathbb{E}\big[\hat{f}(x)\big]^2 \\
+= Bias\big(\hat{f}(x)\big)^2 + Var\big(\hat{f}(x)\big) \\
+\end{align}
+$$<p>This decomposition of the MSE is known as the bias variance decomposition. The reason it&rsquo;s useful is that it shows us concretely how bias and variance influence the expected generalization error. We can see that bias has an outsized impact on the generalization error and variance also contributes. For simplicity the above derivation leaves out the irreducible noise component which represents the noise intrinsict in our training data which we can&rsquo;t remove.</p>
+<p>It&rsquo;s also worth noting that for other kinds of errors/losses there are other bias variance decompositions (<a href="https://rasbt.github.io/mlxtend/user_guide/evaluate/bias_variance_decomp/" target="_blank" rel="noopener">see here</a>).</p>
+<h3 id="the-tradeoff">The Tradeoff</h3>
+<p>Bias and variance are often thought of in terms of trading off one for the other. For example if you have a high bias model you may reduce the bias by choosing a more flexible model which can better fit the training data. However, the more flexible model may be more prone to overfitting the data because of its flexibility and so we end up trading bias for a higher variance.</p>
+<p>The opposite direction is also true, if we have a model that is overfitting with high variance we may choose a less flexible model and give up some bias in exchange for lower variance.</p>
+<p>The figure below shows this tradeoff along with the decomposition of MSE.</p>
+
+
+
+
+
+
+
+
+<figure style="padding: 0.25rem; margin: 0.25rem 0; background-color: #ffffff; float: none; display: block;text-align: center;">
+	<img style="width: auto; height: auto; float: none; display: block; margin-left: auto; margin-right: auto;text-align: center;" src="/bias-and-variance/bvtrade_hu5853028431497679939.png" width="600" height="377" alt="Bias Variance Tradeoff">
+	<figcaption>
+	<small>
+	
+	 Illustration of Bias Variance Tradeoff (from wiki). 
+	
+	</small>
+	</figcaption>
+</figure>  
+<p>As practitioners our goal is to choose a model that has a good balance between bias and variance. In other words we need to avoid underfitting and overfitting!</p>
+<h2 id="reducing-variance">Reducing Variance</h2>
+<p>In my previous blog post on <a href="https://breslav.github.io/reviewing-decision-trees/">decision trees</a>, I mentioned that ensembles of decision trees can result in a model with reduced variance. This led me to wonder how exactly do ensembles reduce variance?</p>
+<p>Well, it turns out my initial statement was a bit too broad. It&rsquo;s more accurate to say that specific ensembling techniques like bagging and random forests were designed to reduce variance. On the other hand, ensembling techniques like boosting were designed to reduce bias. It&rsquo;s also possible that an ensembling technique may reduce both bias and variance but it would depend in general.</p>
+<p>With that clarification out of the way the revised question becomes:</p>
+<blockquote>
+<p>How do ensemble techniques like bagging and random forests lead to models with lower variance than their constituents?</p>
+</blockquote>
+<p>The main insight to answering this question comes from looking at what happens if we take a pair of random variables and compute the variance of their average?</p>
+<h3 id="averaging-model-predictions">Averaging Model Predictions</h3>
+<p>Suppose, we had two models whose predictions (random with respect to training dataset choice) are modeled as random variables \(X\) and \(Y\).</p>
+<p>What would happen if we averaged the predictions of the two models and computed the variance of this average?</p>
+$$
+\begin{align}
+Var\big(\frac{1}{2}X + \frac{1}{2}Y\big) \\
+= \frac{1}{4}Var(X) + \frac{1}{4}Var(Y) + \frac{1}{2} \; Cov \; (X,Y)
+\end{align}
+$$<p>The second line follows from the properties of variance (see <a href="https://en.wikipedia.org/wiki/Variance#Propagation" target="_blank" rel="noopener">wiki</a>).
+Now let&rsquo;s bring correlation \(\rho\) into the picture:</p>
+$$
+\rho = \frac{Cov\;(X,Y)}{\sigma_x\;\sigma_y}
+$$<p>If we re-arrange for covariance and substitute into the prior equation we get the following expression for the variance of the average:</p>
+$$
+\begin{align}
+= \frac{1}{4}Var(X) + \frac{1}{4}Var(Y) + \frac{1}{2} \; \rho \; \sigma_x \; \sigma_y \\
+= \frac{1}{4}\sigma_x^2 + \frac{1}{4}\sigma_y^2 + \frac{1}{2} \; \rho \; \sigma_x \; \sigma_y 
+\end{align}
+$$<p>If we assume the models have identical variance then we get:</p>
+$$
+\begin{align}
+= \frac{1}{4}\sigma^2 + \frac{1}{4}\sigma^2 + \frac{1}{2} \; \rho \; \sigma \; \sigma  \\
+= \frac{1}{2}\sigma^2 + \frac{1}{2} \; \rho \; \sigma^2 
+\end{align}
+$$<p>Now, we see that there are two terms that characterize the variance of the average prediction:</p>
+<ul>
+<li>The first term shows that the predictor obtained from averaging has half the variance of either individual predictor (assuming equal variance).</li>
+<li>The second term shows that when the predictors have 0 correlation then the total variance is just the first term. If there is some correlation (less than 1) then the variance increases proportionally but will still be reduced relative to each individual predictor.</li>
+</ul>
+<p>Finally we have the mathematical intuition as to why averaging predictors can result in a predictor that has lower variance and this is the answer to our question.</p>
+<h3 id="wrapping-up">Wrapping Up</h3>
+<p>We have shown <em>why</em> taking an average across multiple predictors can result in a predictor with lower variance. Now let&rsquo;s connect it back to decision trees which motivated this blog post.</p>
+<ul>
+<li>Decision trees tend to have high variance due to their flexiblity to fit data. We would like to reduce variance so that our model can generalize better.</li>
+<li>Bagging decision trees implies training multiple trees on different bootstraps and making a prediction by averaging predictions from individual trees. We now understand why this reduces variance.</li>
+<li>However, trees in a bag are still likely to be fairly correlated which reduces how much the ensemble reduces variance.</li>
+<li>Random forests address this problem by further decorrelating the individual predictors (decision trees). This is achieved by randomly choosing which subset of features are available to split on at a particular node.</li>
+</ul>
+<h2 id="conclusion">Conclusion</h2>
+<p>In this post we&rsquo;ve looked at bias and variance from a conceptual and mathematical view. We&rsquo;ve also shown mathematically why ensembling (in specific ways) has the potential to reduce model variance.</p>
+<h3 id="references">References</h3>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Bias%e2%80%93variance_tradeoff" target="_blank" rel="noopener">Wiki on Bias Variance Tradeoff</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Variance#Propagation" target="_blank" rel="noopener">Wiki on Variance</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Correlation" target="_blank" rel="noopener">Wiki on Correlation</a></li>
+<li><a href="https://stats.stackexchange.com/questions/380023/how-can-we-explain-the-fact-that-bagging-reduces-the-variance-while-retaining-t" target="_blank" rel="noopener">Stack Exchange Question</a></li>
+<li><a href="https://rasbt.github.io/mlxtend/user_guide/evaluate/bias_variance_decomp/" target="_blank" rel="noopener">mlxtend Blog</a></li>
+<li><a href="https://cscherrer.github.io/post/bias-variance/" target="_blank" rel="noopener">cscherrer Blog</a></li>
+<li><a href="https://www.cs.cornell.edu/courses/cs4780/2018fa/lectures/lecturenote12.html" target="_blank" rel="noopener">Cornell CS</a></li>
+</ul>
+
+</content>
+<p>
+  
+</p>
+
+  </main>
+  <footer><small>
+  Copyright &copy; 2025 Mikhail Breslav 
+</small></footer>
+
+    
+</body>
+
+</html>
