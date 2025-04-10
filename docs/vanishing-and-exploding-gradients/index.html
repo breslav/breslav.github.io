@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0" />
+<link rel="shortcut icon" href="https://breslav.github.io/images/favicon-32x32.png" />
+<title>Vanishing and Exploding Gradients | Mikhail Breslav</title>
+<meta name="title" content="Vanishing and Exploding Gradients" />
+<meta name="description" content="Let&rsquo;s start with a brief history lesson. If we go back in the history of neural networks we can see that backpropagation was developed in the 1970s and popularized in the 1980s. Despite the brilliance of backpropagation, deep neural networks (DNNs) were very difficult to train. In 1991 Sepp Hochreiter analyzed the vanishing gradient problem which was a major hurdle for training DNNs. Fast forward to today and you&rsquo;ll notice that training DNNs involves using a number of tricks many of which evolved to tackle vanishing (and exploding) gradients." />
+<meta name="keywords" content="" />
+
+
+<meta property="og:url" content="https://breslav.github.io/vanishing-and-exploding-gradients/">
+  <meta property="og:site_name" content="Mikhail Breslav">
+  <meta property="og:title" content="Vanishing and Exploding Gradients">
+  <meta property="og:description" content="Let’s start with a brief history lesson. If we go back in the history of neural networks we can see that backpropagation was developed in the 1970s and popularized in the 1980s. Despite the brilliance of backpropagation, deep neural networks (DNNs) were very difficult to train. In 1991 Sepp Hochreiter analyzed the vanishing gradient problem which was a major hurdle for training DNNs. Fast forward to today and you’ll notice that training DNNs involves using a number of tricks many of which evolved to tackle vanishing (and exploding) gradients.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2025-04-09T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-04-09T00:00:00+00:00">
+    <meta property="og:image" content="https://breslav.github.io/images/share.png">
+
+
+
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://breslav.github.io/images/share.png">
+  <meta name="twitter:title" content="Vanishing and Exploding Gradients">
+  <meta name="twitter:description" content="Let’s start with a brief history lesson. If we go back in the history of neural networks we can see that backpropagation was developed in the 1970s and popularized in the 1980s. Despite the brilliance of backpropagation, deep neural networks (DNNs) were very difficult to train. In 1991 Sepp Hochreiter analyzed the vanishing gradient problem which was a major hurdle for training DNNs. Fast forward to today and you’ll notice that training DNNs involves using a number of tricks many of which evolved to tackle vanishing (and exploding) gradients.">
+
+
+
+
+  <meta itemprop="name" content="Vanishing and Exploding Gradients">
+  <meta itemprop="description" content="Let’s start with a brief history lesson. If we go back in the history of neural networks we can see that backpropagation was developed in the 1970s and popularized in the 1980s. Despite the brilliance of backpropagation, deep neural networks (DNNs) were very difficult to train. In 1991 Sepp Hochreiter analyzed the vanishing gradient problem which was a major hurdle for training DNNs. Fast forward to today and you’ll notice that training DNNs involves using a number of tricks many of which evolved to tackle vanishing (and exploding) gradients.">
+  <meta itemprop="datePublished" content="2025-04-09T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2025-04-09T00:00:00+00:00">
+  <meta itemprop="wordCount" content="1494">
+  <meta itemprop="image" content="https://breslav.github.io/images/share.png">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  body {
+    font-family: Verdana, sans-serif;
+    margin: auto;
+    padding: 20px;
+    max-width: 720px;
+    text-align: left;
+    background-color: white;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: #444;
+  }
+
+  figure {
+    float: left;
+    margin-top: 0.2cm;
+    margin-left: auto;
+    margin-right: 0.5cm;
+  }
+
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  b {
+    color: #222;
+  }
+
+  a {
+    color: #3273dc;
+  }
+
+  .title {
+    text-decoration: none;
+    border: 0;
+  }
+
+  .title span {
+    font-weight: 400;
+  }
+
+  nav a {
+    margin-right: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+
+  content {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    padding: 2px 5px;
+    background-color: #eee;
+  }
+
+  pre code {
+    border-left: 1px solid #999;
+    color: #555;
+    display: block;
+    padding: 10px;
+    white-space: pre-wrap;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: #555;
+    padding-left: 10px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px;
+    text-align: center;
+  }
+
+  .helptext {
+    color: #777;
+    font-size: small;
+  }
+
+  .errorlist {
+    color: #eba613;
+    font-size: small;
+  }
+
+  h4 {
+    margin-bottom: -0.25cm;
+}
+</style>
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-ND7MED44L2"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-ND7MED44L2');
+        }
+      </script>
+
+  
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],  
+      inlineMath: [['\\(', '\\)']]                  
+    }
+  };
+</script>
+  
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>Mikhail Breslav</h2>
+</a>
+<nav><a href="/">Home</a>
+
+<a href="/cv/">CV</a>
+
+<a href="/blog">Blog</a>
+</nav>
+</header>
+  <main>
+
+<h1>Vanishing and Exploding Gradients</h1>
+<p>
+  <i>
+    <time datetime='2025-04-09' pubdate>
+      09 Apr, 2025
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>Let&rsquo;s start with a brief history lesson. If we go back in the <a href="https://en.wikipedia.org/wiki/History_of_artificial_neural_networks" target="_blank" rel="noopener">history of neural networks</a> we can see that backpropagation was developed in the 1970s and popularized in the 1980s. Despite the brilliance of backpropagation, deep neural networks (DNNs) were very difficult to train. In 1991 Sepp Hochreiter analyzed the vanishing gradient problem which was a major hurdle for training DNNs. Fast forward to today and you&rsquo;ll notice that training DNNs involves using a number of tricks many of which evolved to tackle vanishing (and exploding) gradients.</p>
+<p>In this blog post I want to summarize the problem of vanishing and exploding gradients and summarize some of the (imperfect) tricks for mitigating them.</p>
+<h2 id="vanishing-gradients">Vanishing Gradients</h2>
+<p>As mentioned, one of the barriers to effectively training DNNs in the early days was the problem of vanishing gradients. Vanishing gradients refers to the phenomenon that as backpropagation proceeds you can end up with gradients that are so small that they effectively have no impact on the weights that they correspond to. If many weights are barely able to change (particularly at earlier layers) this can lead to poor or unstable training. In essence the network is unable to learn effectively and training will result in a poor solution.</p>
+<p>Let&rsquo;s examine how vanishing gradients can arise:</p>
+<ul>
+<li>During backprop we are interested in updating each weight (and bias) so that it reduces the loss. This means we need to compute the gradient of the loss with respect to each weight (and bias).</li>
+<li>When we want to compute this gradient for some intermediate weight in the network we will employ the chain rule. In general the chain rule will result in a sum of products, e.g imagine a neuron with two paths of gradients flowing into it.</li>
+<li>If you have a product with many terms and those terms are relatively small then you will end up with a really small value. This is exactly what can happen when you are calculating the gradient for weights in earlier layers of the network. In other words the gradient begins to vanish!</li>
+</ul>
+<p>It turns out that the vanishing gradient problem can be made <em>worse</em> by the activation function used as well as the magnitude of the weights in the network. Let&rsquo;s see why this would be.</p>
+<h3 id="impact-of-activation-function-and-weights">Impact of Activation Function and Weights</h3>
+<p>If we zoom into the chain rule we can make a few observations. Let&rsquo;s consider that in some early layer of our network we have an activation function \(\theta\) which takes in as input \(w_1x_1 + w_2x_2 + b\), giving us the function:</p>
+$$
+y = \theta(w_1x_1 + w_2x_2 + b)
+$$<p>During backprop we would use the chain rule to compute the gradient that will be used to update the weights and bias. Let&rsquo;s focus on \(w_1\) in this example.</p>
+$$
+\frac{\partial{L}}{\partial{w_1}} = \frac{\partial{L}}{\partial{y}} \frac{\partial{y}}{\partial{w_1}}  
+$$<p>The second term in this product of gradient becomes:</p>
+$$
+\frac{\partial{y}}{\partial{w_1}} = \theta'(w_1x_1 + w_2x_2 + b) x_1
+$$<p>We now see that this gradient depends on the derivative of our activation function (at some input value) and it also depends on the value of one of the inputs (\(x_1\)) into the neuron. If the derivative of our activation functions produces small gradients then that would be one way our gradient is pushed to be small. Additionally if the weights of earlier layers are very small that could result in the input to our neuron also being very small. If both of these factors occur we now have a product of two small values which is even smaller. These problems compound with many layers and as we go further back in the network (to earlier layers)!</p>
+<h3 id="tricks">Tricks</h3>
+<p>Several tricks have been proposed to alleviate the problem of vanishing gradients.</p>
+<ul>
+<li>
+<p>At some point the ReLU activation function was proposed which largely replaced activation functions like sigmoid (and tanh). The sigmoid function has a gradient which approaches 0 for both very small and very large inputs. With our analysis above we can now see how the gradient of the activation function can impact other gradients. ReLU on the other hand has a constant derivative of 1 for all positive values, which means that very small gradients are eliminated. (ReLU is still problematic when the input is negative leading to a gradient of 0).</p>
+</li>
+<li>
+<p>Skip connections are another trick that in a literal sense side step the problem of vanishing gradients. In particular a skip connection results in a function that looks like \(y = f(x) + x\). During backprop when we are interested in \(\frac{\partial{y}}{\partial{x}}\) we can see that regardless of how much the gradient vanishes due to \(f(x)\), we still have a gradient of 1 added to our vanishing gradient. In otherwords this allows the gradient from layers closer to the loss to continue flowing to earlier layers.</p>
+</li>
+<li>
+<p>Weight initialization schemes are another trick that can help with vanishing gradients. Schemes like <a href="https://www.youtube.com/watch?v=ScWTYHQra5E" target="_blank" rel="noopener">Glorot/He initialization</a> propose uniform/Gaussian distributions from which to sample weight values. The shape of these distributions also depends on the fan-in and/or fan-out of the layer. At a high level these schemes help keep activation values and gradients from getting too large or too small and have been shown to help with the vanishing gradient problem (see page 254 from the Glorot initialization <a href="https://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf" target="_blank" rel="noopener">paper</a> for example).</p>
+</li>
+<li>
+<p>Batch normalization (batch norm) can (at least in theory) help with vanishing gradients because it allows the network to learn to shift the distribution of values going into activation functions in such a way that it reduces small gradients. For example with sigmoid, batch norm could keep shift the input values so they are centered on the linear part of the sigmoid activation which would avoid small gradients. In practice I&rsquo;m not sure whether it has actually been demonstrated that batch norm achieves this. [As an aside, the original batch norm paper makes several claims about why it works well but the latest <a href="https://proceedings.neurips.cc/paper_files/paper/2018/file/905056c1ac1dad141560467e0a99e1cf-Paper.pdf" target="_blank" rel="noopener">research</a> concludes that batch norm works well because it helps in generating a smoother loss surface].</p>
+</li>
+</ul>
+<h2 id="exploding-gradients">Exploding Gradients</h2>
+<p>A twin problem to vanishing gradients is known as exploding gradients. Exploding gradients refers to the phenomenon where gradients become too large during training which can lead to problems like numerical instability or difficulty in training. Exploding gradients can arise in similar ways as vanishing gradients. Recall that during backprop we can have gradient computations that involve the product of a large number of terms. If these terms are large, then we can end up with gradients that are enormous and potentially overflow. Even if gradients don&rsquo;t overflow they can result in the optimizer overshooting a good local minima, or oscillating, or even diverging.</p>
+<p>As with vanishing gradients, the gradient computation can be sensitive to the magnitude of the weights in the network. Therefore we would like to avoid large weight values which could produce exploding gradients.</p>
+<h3 id="tricks-1">Tricks</h3>
+<p>Some of the tricks used to deal with vanishing gradients are also effective for dealing with exploding gradients. Particularly techniques that influence the scale of inputs to an activation or outputs of an activation (e.g weight initialization schemes and batch norm).</p>
+<p>Another simple way to prevent exploding gradients is with gradient clipping. One approach to gradient clipping is to clip components of a gradient that are larger than some value, but this has the downside of potentially making a drastic change to the direction of the gradient. A second approach is to clip the magnitude of the gradient thereby preserving the direction of the gradient (this can come at the cost of taking more time to converge).</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>In this blog post we looked at how the problems of vanishing and exploding gradients arise when training DNNs. We also looked at several tricks that have been employed to mitigate these problems including:</p>
+<ul>
+<li>Weight initialization schemes</li>
+<li>Better activation functions like ReLU</li>
+<li>Skip connections</li>
+<li>Batch normalization</li>
+<li>Gradient clipping</li>
+</ul>
+<p>An important point to make here is that these tricks are far from perfect solutions and they generally have their own problems. Researchers will continue trying new ideas and eventually some or all of the current tricks will be replaced with new ones.</p>
+<p>A few examples of this taking place:</p>
+<ul>
+<li>
+<p>ReLU has a gradient of 0 for inputs that are negative. This leads to the problem of dying neurons. Specifically,
+if the weights that influence a ReLU to be 0 are not updated then the neuron will forever output 0. More recently, alternative activation functions like leaky ReLU have been proposed to avoid this problem (leaky ReLU has a small negative gradient).</p>
+</li>
+<li>
+<p>Batch normalization, while effective for larger batch sizes, has been shown to be ineffective when batch sizes are small (e.g consider the distributed training setting). <a href="https://arxiv.org/pdf/1803.08494" target="_blank" rel="noopener">Alternative normalizations</a>, like layer norm, have been proposed that avoid a dependency on batch size (layer norm normalizes each data point independently based on values in the layer).</p>
+</li>
+<li>
+<p>While Glorot and He initializations were popular it seems that simpler initialization schemes with fixed variance have also been successfully used (see <a href="https://huggingface.co/docs/transformers/en/model_doc/gpt2" target="_blank" rel="noopener">GPT2</a>).</p>
+</li>
+</ul>
+<h3 id="references">References</h3>
+<p>All references are linked inline!</p>
+
+</content>
+<p>
+  
+</p>
+
+  </main>
+  <footer><small>
+  Copyright &copy; 2025 Mikhail Breslav 
+</small></footer>
+
+    
+</body>
+
+</html>

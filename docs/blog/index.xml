@@ -7,8 +7,15 @@
     <generator>Hugo</generator>
     <language>en-US</language>
     <copyright>Copyright © 2025, Mikhail Breslav.....</copyright>
-    <lastBuildDate>Wed, 02 Apr 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 09 Apr 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://breslav.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Vanishing and Exploding Gradients</title>
+      <link>https://breslav.github.io/vanishing-and-exploding-gradients/</link>
+      <pubDate>Wed, 09 Apr 2025 00:00:00 +0000</pubDate>
+      <guid>https://breslav.github.io/vanishing-and-exploding-gradients/</guid>
+      <description>&lt;p&gt;Let&amp;rsquo;s start with a brief history lesson. If we go back in the &lt;a href=&#34;https://en.wikipedia.org/wiki/History_of_artificial_neural_networks&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;history of neural networks&lt;/a&gt; we can see that backpropagation was developed in the 1970s and popularized in the 1980s. Despite the brilliance of backpropagation, deep neural networks (DNNs) were very difficult to train. In 1991 Sepp Hochreiter analyzed the vanishing gradient problem which was a major hurdle for training DNNs. Fast forward to today and you&amp;rsquo;ll notice that training DNNs involves using a number of tricks many of which evolved to tackle vanishing (and exploding) gradients.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Bias and Variance</title>
       <link>https://breslav.github.io/bias-and-variance/</link>
