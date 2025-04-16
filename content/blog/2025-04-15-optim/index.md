@@ -14,11 +14,11 @@ Broadly speaking, gradient descent is *the* foundational algorithm for training 
 In modern day training of deep neural networks, mini batch stochastic gradient descent ([MB-SGD](https://d2l.ai/chapter_optimization/minibatch-sgd.html)) is the preferred optimizer. MB-SGD represents a compromise between SGD (efficient but noisy gradients) and GD (very inefficient but accurate gradients).
 
 As great as MB-SGD is, it can still run into several problems during optimization: 
-1. The optimizer may get stuck in a local minima (DNN losses are non convex).
+1. The optimizer may get stuck in a poor local minima (DNN losses are non convex).
 2. The optimizer may take too long to converge to a solution.
 3. The optimizer may oscillate or diverge. 
 
-These problems not only impact the quality of the model being trained but also impact the amount of time it takes to train the model. In practice a lot of experimentation may be required before having a successful training run. Additional training time not only slows down engineering and research progress but it also results in higher training costs and additional [energy consumption](https://pubs.acs.org/doi/pdf/10.1021/acs.est.3c01106). 
+These problems not only impact the quality of the model being trained but also impact the amount of time it takes to train the model. In practice a lot of experimentation may be required before having a successful training run. Additional training time not only slows down engineering and research progress but it also results in higher training costs and higher [energy consumption](https://pubs.acs.org/doi/pdf/10.1021/acs.est.3c01106). 
 
 To address these problems researchers have come up with a variety of approaches (tricks) that have been shown to empirically outperform vanilla MB-SGD for certain problems. It's also important to note that there is no single approach that is optimal for all problems ([no free lunch](https://en.wikipedia.org/wiki/No_free_lunch_theorem)).
 
@@ -41,7 +41,7 @@ m_t = \beta m_{t-1} - \eta g_t \\
 \end{align}
 $$
 
-The variable \(m_t\) represents an exponentially decaying sum of past gradients from which we subtract the current gradient \(g_t\) multiplied by the learning rate \(\eta\). The hyperparameter \(\beta\) represents the momentum and can have a value between 0 and 1. The closer \(\beta\) is to 1 the more we emphasize the history of the gradient in our update and thus the more momentum we have. The closer \(\beta\) is to 0 the less we emphasize our past gradients and thus the less momentum we have. A popular choice for \(\beta\)is \(0.9\). 
+The variable \(m_t\) represents an exponentially decaying sum of past gradients from which we subtract the current gradient \(g_t\) multiplied by the learning rate \(\eta\). The hyperparameter \(\beta\) represents the momentum and can have a value between 0 and 1. The closer \(\beta\) is to 1 the more we emphasize the history of the gradient in our update and thus the more momentum we have. The closer \(\beta\) is to 0 the less we emphasize our past gradients and thus the less momentum we have. A popular choice for \(\beta\) is \(0.9\). 
 
 Integrating momentum into our standard gradient descent update equation produces:
 
@@ -79,9 +79,9 @@ In the gradient update step we see that it looks identical to regular gradient d
 
 
 ### Adam 
-The last type of optimizer we will cover is [Adam](https://arxiv.org/pdf/1412.6980) (short for adaptive moment estimation) which essentially combines momentum with adaptive learning rates (RMSProp). While I haven't checked whether ADAM is still state of the art it seems like the common choice of optimizer in many publications. 
+The last type of optimizer we will cover is [Adam](https://arxiv.org/pdf/1412.6980) (short for adaptive moment estimation) which essentially combines momentum with adaptive learning rates (RMSProp). While I haven't checked whether Adam is still state of the art it seems like the common choice of optimizer in many publications. 
 
-Below is the algorithm as written in the original paper. Since we have already discussed the key components that ADAM combines, it should be relatively easy to understand this algorithm.
+Below is the algorithm as written in the original paper. Since we have already discussed the key components that Adam combines, it should be relatively easy to understand this algorithm.
 
 {{< imgproc adam Resize "800x" "Adam Algorithm" >}} Adam Algorithm (from the paper). {{< /imgproc >}}
 
@@ -94,30 +94,41 @@ Let's quickly review:
 Finally, I wanted to note that there is an extension to Adam known as [AdamW](https://arxiv.org/pdf/1711.05101) which shows that L2 regularization is not effective when used with Adam. AdamW proposes an alternative algorithm which has also been commonly adopted.  
 
 ### Optimizer Memory
-One point that may not be immediately obvious about all of the optimizers we discussed is that they are applied per each parameter. Since these optimizers depend on expoentnially decaying averages of gradients and/or square gradients, each parameter will need to store its associated averages. This of course adds to the memory needed for training! 
+One point that may not be immediately obvious about all of the optimizers we discussed is that they are applied per parameter. Since these optimizers depend on exponentially decaying averages of gradients and/or square gradients, each parameter will need additional memory to store its associated averages. This additional memory can add up for large networks! 
 
 ## Learning Rate Schedules
-Prior to reading about learning rate schedules, I wondered why they are needed if optimizers like RMSProp and Adam effectively scale the learning rate. One insight is that the optimizers discussed are local in their behavior, the scale factor they apply is local to each parameter.
+Prior to reading about learning rate schedules, I wondered why they are needed if optimizers like RMSProp and Adam effectively scale the learning rate. One insight is that the optimizers discussed are local -- they only care about the gradients associated with a specific parameter.   
 
 Learning rate schedules, on the other hand, provide a way to set and adjust the learning rate globally for all parameters.
-The benefit of learning rate schedules is that often they can converge to a solution significantly faster than a fix learning rate. Typically learning rate schedules adjust the learning rate as a function of either the number of training epochs passed or the number of training iterations passed (e.g per mini-batch).
+The benefit of learning rate schedules is that they can (potentially) converge to a solution significantly faster than a fixed learning rate. 
 
 The challenge with a learning rate schedule is that we don't want it to decay too quickly as that could result in a longer convergence time, but we also don't want it to decay too slowly as that could prevent it from settling in a good minima. In other words we want to follow the [Goldilocks principle](https://en.wikipedia.org/wiki/Goldilocks_principle). 
 
+Before looking at some of the most popular learning rate schedules it's worth noting that learning rate schedules typically adjust the learning rate as a function of either the number of training epochs passed or the number of training iterations passed (e.g per mini-batch).
+
 Some of the most popular learning rate schedules are:
 - Step, where the learning rate is decreased by some factor every \(N\) iterations or epochs.  
-- Exponential, where the learning rate is decayed exponentially over iterations or epochs.
-- Reduce on Plateau, where the learning rate is reduced when the some metric (like validation loss) plateaus (stops progressing). 
+- Exponential, where the learning rate is decayed exponentially over iterations or epochs (smooth).
+- Reduce on Plateau, where the learning rate is reduced by some factor when a metric (like validation loss) plateaus (stops progressing). 
 - [1 Cycle](https://arxiv.org/pdf/1708.07120), where the learning rate ramps up to some maxiumum learning rate and then decays at a slower rate to some minimum learning rate.
-- [SGDR](https://arxiv.org/pdf/1608.03983v5), uses cosine annealing to decay the learning rate but also has warm restarts where the learning rate jumps up to the maximum learning rate every \(N\) iterations or epochs. 
+- [SGDR](https://arxiv.org/pdf/1608.03983v5), which uses cosine annealing to decay the learning rate but also has warm restarts where the learning rate jumps up to the maximum learning rate every \(N\) iterations or epochs. 
 
 As with optimizers there will not be one learning rate schedule that is optimal for all problems, so experimentation is still key. 
 
-
 ## Conclusion
+In this blog post we motivated the need for optimizing gradient descent which boils down to wanting to find the best solution in the least amount of time. We looked at the ideas of momentum and adaptive learning rates which feed into popular optimizers of the day like Adam. Finally, we (briefly) looked at a few learning rate schedules which have the potential to further speed up our training time.
+
+A few closing thoughts:
+- The benefit of saving training time should not be underestimated since it can have a compounding effect. 
+- Relatedly, it's easy to imagine that for very large models these time savings could be measured in days if not weeks etc. As mentioned this really does save money and energy.
+- It feels like there is an ever growing list of design decisions we must make as deep learning practitioners. We now add two more decisions (optimizer and learning rate schedule) to the pile. The pile is too large to exhaustively try out all possibilities so instead we need some guiding principle. A few reasonable approaches may be:
+  - Start with the choices made by other researchers if your problem is similar in nature.
+  - Start with the simplest choices so as to establish a benchmark and then try advanced alternatives (e.g start with vanilla SGD and a constant learning rate).
+  - As budget allows compare different choices (e.g vanilla SGD vs Adam, constant learning rate vs step).
+- Deep Learning is really an experimental science, so experimentation is key!
 
 
 ### References
-All references are linked inline!
+- [Stat 453 Lecture by Sebastian Raschka](https://www.youtube.com/watch?v=Owm1H0ukjS4) -- as usual lots of great educational material from Sebastian.
 
 
