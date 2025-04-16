@@ -7,8 +7,15 @@
     <generator>Hugo</generator>
     <language>en-US</language>
     <copyright>Copyright © 2025, Mikhail Breslav.....</copyright>
-    <lastBuildDate>Wed, 09 Apr 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 15 Apr 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://breslav.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Optimizing Gradient Descent</title>
+      <link>https://breslav.github.io/optimizing-gradient-descent/</link>
+      <pubDate>Tue, 15 Apr 2025 00:00:00 +0000</pubDate>
+      <guid>https://breslav.github.io/optimizing-gradient-descent/</guid>
+      <description>&lt;p&gt;Broadly speaking, gradient descent is &lt;em&gt;the&lt;/em&gt; foundational algorithm for training neural networks. A lot of effort has gone into optimizing gradient descent (optimizing the optimizer) and in this blog post I want to:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Summarize the goal of optimizing gradient descent.&lt;/li&gt;&#xA;&lt;li&gt;Look at a few popular optimizers and the concepts that underly them.&lt;/li&gt;&#xA;&lt;li&gt;Touch on learning rate schedules.&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;&#xA;&lt;p&gt;In modern day training of deep neural networks, mini batch stochastic gradient descent (&lt;a href=&#34;https://d2l.ai/chapter_optimization/minibatch-sgd.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MB-SGD&lt;/a&gt;) is the preferred optimizer. MB-SGD represents a compromise between SGD (efficient but noisy gradients) and GD (very inefficient but accurate gradients).&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Vanishing and Exploding Gradients</title>
       <link>https://breslav.github.io/vanishing-and-exploding-gradients/</link>
