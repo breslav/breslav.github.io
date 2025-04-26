@@ -3,10 +3,13 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://breslav.github.io/</loc>
-    <lastmod>2025-04-15T00:00:00+00:00</lastmod>
+    <lastmod>2025-04-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://breslav.github.io/blog/</loc>
-    <lastmod>2025-04-15T00:00:00+00:00</lastmod>
+    <lastmod>2025-04-25T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://breslav.github.io/dropout-briefly/</loc>
+    <lastmod>2025-04-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://breslav.github.io/optimizing-gradient-descent/</loc>
     <lastmod>2025-04-15T00:00:00+00:00</lastmod>

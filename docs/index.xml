@@ -7,8 +7,15 @@
     <generator>Hugo</generator>
     <language>en-US</language>
     <copyright>Copyright © 2025, Mikhail Breslav.....</copyright>
-    <lastBuildDate>Tue, 15 Apr 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 25 Apr 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://breslav.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Dropout (Briefly)</title>
+      <link>https://breslav.github.io/dropout-briefly/</link>
+      <pubDate>Fri, 25 Apr 2025 00:00:00 +0000</pubDate>
+      <guid>https://breslav.github.io/dropout-briefly/</guid>
+      <description>&lt;p&gt;One topic that I&amp;rsquo;ve wanted to briefly cover in a blog post is dropout. When I first encountered dropout some years ago, I found it to be pretty mystical and not particularly intuitive. Dropout is worth knowing as it&amp;rsquo;s still a key ingredient for regularizing (large) neural networks.&lt;/p&gt;&#xA;&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;&#xA;&lt;p&gt;Whenever a large neural network is trained there is some risk that it will overfit the training data. Some of the tricks one can employ to combat overfitting are the following:&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Optimizing Gradient Descent</title>
       <link>https://breslav.github.io/optimizing-gradient-descent/</link>
