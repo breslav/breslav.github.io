@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0" />
+<link rel="shortcut icon" href="https://breslav.github.io/images/favicon-32x32.png" />
+<title>Graph Traversals (Briefly) | Mikhail Breslav</title>
+<meta name="title" content="Graph Traversals (Briefly)" />
+<meta name="description" content="When it comes to graphs, traversal algorithms like BFS and DFS are among the most important algorithms to know and work with. However, the implementation of BFS and DFS can be a bit nuanced with respect to the type of graph we are working with. In this blog post I want to briefly summarize some of these nuances.
+Introduction
+In general we can have undirected and directed graphs, which consist of one or more connected components (CC), which can be acyclic or cyclic. The table below lists the different types of graphs that I want to look at in this post." />
+<meta name="keywords" content="" />
+
+
+<meta property="og:url" content="https://breslav.github.io/graph-traversals-briefly/">
+  <meta property="og:site_name" content="Mikhail Breslav">
+  <meta property="og:title" content="Graph Traversals (Briefly)">
+  <meta property="og:description" content="When it comes to graphs, traversal algorithms like BFS and DFS are among the most important algorithms to know and work with. However, the implementation of BFS and DFS can be a bit nuanced with respect to the type of graph we are working with. In this blog post I want to briefly summarize some of these nuances.
+Introduction In general we can have undirected and directed graphs, which consist of one or more connected components (CC), which can be acyclic or cyclic. The table below lists the different types of graphs that I want to look at in this post.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2025-05-05T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-05-05T00:00:00+00:00">
+    <meta property="og:image" content="https://breslav.github.io/images/share.png">
+
+
+
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://breslav.github.io/images/share.png">
+  <meta name="twitter:title" content="Graph Traversals (Briefly)">
+  <meta name="twitter:description" content="When it comes to graphs, traversal algorithms like BFS and DFS are among the most important algorithms to know and work with. However, the implementation of BFS and DFS can be a bit nuanced with respect to the type of graph we are working with. In this blog post I want to briefly summarize some of these nuances.
+Introduction In general we can have undirected and directed graphs, which consist of one or more connected components (CC), which can be acyclic or cyclic. The table below lists the different types of graphs that I want to look at in this post.">
+
+
+
+
+  <meta itemprop="name" content="Graph Traversals (Briefly)">
+  <meta itemprop="description" content="When it comes to graphs, traversal algorithms like BFS and DFS are among the most important algorithms to know and work with. However, the implementation of BFS and DFS can be a bit nuanced with respect to the type of graph we are working with. In this blog post I want to briefly summarize some of these nuances.
+Introduction In general we can have undirected and directed graphs, which consist of one or more connected components (CC), which can be acyclic or cyclic. The table below lists the different types of graphs that I want to look at in this post.">
+  <meta itemprop="datePublished" content="2025-05-05T00:00:00+00:00">
+  <meta itemprop="dateModified" content="2025-05-05T00:00:00+00:00">
+  <meta itemprop="wordCount" content="1304">
+  <meta itemprop="image" content="https://breslav.github.io/images/share.png">
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  body {
+    font-family: Verdana, sans-serif;
+    margin: auto;
+    padding: 20px;
+    max-width: 720px;
+    text-align: left;
+    background-color: white;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: #444;
+  }
+
+  figure {
+    float: left;
+    margin-top: 0.2cm;
+    margin-left: auto;
+    margin-right: 0.5cm;
+  }
+
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  b {
+    color: #222;
+  }
+
+  a {
+    color: #3273dc;
+  }
+
+  .title {
+    text-decoration: none;
+    border: 0;
+  }
+
+  .title span {
+    font-weight: 400;
+  }
+
+  nav a {
+    margin-right: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+
+  content {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    padding: 2px 5px;
+    background-color: #eee;
+  }
+
+  pre code {
+    border-left: 1px solid #999;
+    color: #555;
+    display: block;
+    padding: 10px;
+    white-space: pre-wrap;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: #555;
+    padding-left: 10px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px;
+    text-align: center;
+  }
+
+  .helptext {
+    color: #777;
+    font-size: small;
+  }
+
+  .errorlist {
+    color: #eba613;
+    font-size: small;
+  }
+
+  h4 {
+    margin-bottom: -0.25cm;
+}
+</style>
+
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-ND7MED44L2"></script>
+      <script>
+        var doNotTrack = false;
+        if ( false ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-ND7MED44L2');
+        }
+      </script>
+
+  
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],  
+      inlineMath: [['\\(', '\\)']]                  
+    }
+  };
+</script>
+  
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>Mikhail Breslav</h2>
+</a>
+<nav><a href="/">Home</a>
+
+<a href="/cv/">CV</a>
+
+<a href="/blog">Blog</a>
+</nav>
+</header>
+  <main>
+
+<h1>Graph Traversals (Briefly)</h1>
+<p>
+  <i>
+    <time datetime='2025-05-05' pubdate>
+      05 May, 2025
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>When it comes to graphs, traversal algorithms like BFS and DFS are among the most important algorithms to know and work with. However, the implementation of BFS and DFS can be a bit nuanced with respect to the type of graph we are working with. In this blog post I want to briefly summarize some of these nuances.</p>
+<h2 id="introduction">Introduction</h2>
+<p>In general we can have undirected and directed graphs, which consist of one or more connected components (<strong>CC</strong>), which can be acyclic or cyclic. The table below lists the different types of graphs that I want to look at in this post.</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: center">Undirected</th>
+          <th style="text-align: center">Directed</th>
+          <th style="text-align: center">Cyclic</th>
+          <th style="text-align: center">Acyclic</th>
+          <th style="text-align: center">Single CC</th>
+          <th style="text-align: center">Rooted</th>
+          <th style="text-align: left">Graph Type Name</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">x</td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">x</td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: left">Undirected Cyclic Graph</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">x</td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">x</td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: left">Undirected Acyclic Graph</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">x</td>
+          <td style="text-align: center">x</td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: left">Directed Cyclic Graph</td>
+      </tr>
+      <tr>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">x</td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">x</td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: left">Directed Acyclic Graph</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">x</td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">x</td>
+          <td style="text-align: center">x</td>
+          <td style="text-align: center">x</td>
+          <td style="text-align: left">Rooted Tree</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="graphs">Graphs</h2>
+<p>In general when we wish to traverse a graph we have to worry about visiting nodes that we have already visited and getting stuck in cycles. The table below summarizes the concerns for each type of graph.</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Graph Type Name</th>
+          <th style="text-align: left">Concern</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">Undirected Cyclic Graph</td>
+          <td style="text-align: left">Revisit parent or get stuck in cycle</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Undirected Acyclic Graph</td>
+          <td style="text-align: left">Revisit parent</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Directed Cyclic Graph</td>
+          <td style="text-align: left">Revisit other node or get stuck in cycle</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Directed Acyclic Graph</td>
+          <td style="text-align: left">Revisit other node</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Rooted Tree</td>
+          <td style="text-align: left">Revisit parent</td>
+      </tr>
+  </tbody>
+</table>
+<p>Let&rsquo;s look at how these concerns can arise in a bit more detail:</p>
+<ul>
+<li>If we have an undirected graph and we are performing DFS we can end up revisiting where we immediately came from (which I&rsquo;ll refer to as &ldquo;parent&rdquo; for convenience) since edges are bi-directional. If there is a cycle we then have to worry about entering the cycle and not being able to get out.</li>
+<li>If we have a directed graph and we are performing DFS we can end up revisiting a node that was visited earlier on in the DFS (e.g by traversing another part of the graph that also leads to this node). If the directed graph has a cycle we once again have to worry about getting stuck in it.</li>
+<li>If we have a rooted tree it will depend on how the tree is implemented (see <a href="#trees">trees</a> below) as to whether there is a concern of revisiting the parent.</li>
+</ul>
+<p>Note:</p>
+<ul>
+<li>With BFS we would have the same concerns as DFS.</li>
+<li>If we have an undirected graph and we revisit some node that is not the parent then that means we have a cycle.</li>
+</ul>
+<h3 id="solution">Solution</h3>
+<p>To avoid these problems graph traversal algorithms maintain a <strong>visited</strong> set which keeps track of what nodes have already been visited in the traversal. This way, when we consider recursing to explore a neighbor or adding it to a queue (for future exploration), we fist check whether it was already visited. This prevents us from revisiting nodes and getting stuck in cycles!</p>
+<h2 id="cycle-detection-nuances">Cycle Detection Nuances</h2>
+<p>In general we may not know whether a graph has a cycle or not, which means we may want to detect whether it does. The way cycle detection is done varies depending on whether the graph is undirected or directed.</p>
+<h3 id="undirected">Undirected</h3>
+<p>The general strategy for detecting a cycle in an undirected graph it to perform a DFS where we check whether the node we are going to explore is a node we have already visited. However, since the graph is undirected, when we perform DFS we don&rsquo;t want to consider the edge pointing back to where we came from as an indicator that we have found a cycle. To avoid this &ldquo;false positive detection&rdquo; we can pass an additional parameter to the DFS which represents the &ldquo;parent&rdquo; or &ldquo;from&rdquo; node. Then when looping through neighbors of a node we can ignore the neighbor that we recursed from. If we still encounter a node that was already visited then this means there is a cycle.</p>
+<h3 id="directed">Directed</h3>
+<p>For directed graphs there are two strategies for detecting a cycle that are different than the undirected case. We still have the intuition that we want to avoid visiting a node that we have already visited in the past. Edges are directional so we don&rsquo;t have to worry about directly going back to where we came from during DFS. However, as previously mentioned, it is possible for us to visit a node that was already visited during DFS from another part of the graph.</p>
+<p>For example consider paths a-&gt;b-&gt;c-&gt;e and b-&gt;d-&gt;c, and suppose DFS first visits a,b,c,e and then backtracks and visits d,c. In this example c is revisited but there is no cycle. To avoid visiting c (and subsequently e) a second time we want to maintain a visited set. However, we don&rsquo;t want to incorrectly classify c as representing a cycle in the graph. Therefore, we must maintain our <em>current</em> DFS path and a cycle is detected if we visit a node already in our <em>current</em> path. To maintain the current DFS path we would append the current node to a list when we enter DFS and pop it from the list when we finished exploration from the node, just prior to returning.</p>
+<p>Another strategy that is available to us for detecting cycles in directed graphs is topological sort. If you perform topological sort on a directed graph with a cycle then the sort will not be able to order nodes that are part of the cycle. As a result, we can use the length of the ordering as an indicator for whether there is a cycle. If the length is less than the number of nodes in the component then there is a cycle.</p>
+<p>To understand why cycles result in an incomplete ordering we need to recall that topological sort continues as long as we have nodes with indegree 0. When a node&rsquo;s dependencies are met the nodes indegree becomes 0. However, in a cycle by definition no node can have its dependencies met because the dependencies eventually include itself. Therefore nodes from the cycle will never be added to the ordering and thus the ordering will be incomplete.</p>
+<p>Finally, it&rsquo;s worth noting that topological sort does not apply to undirected graphs since there is no notion of uni-directional dependencies.</p>
+<h2 id="trees">Trees</h2>
+<p>Finally, I want to talk about a point of confusion I had which in part led to this post. I recalled that when I was implementing BFS and DFS on trees I didn&rsquo;t have to bother keeping track of which nodes were already visited. Trees by definition don&rsquo;t have cycles so we wouldn&rsquo;t need to be concerned with getting stuck in one. However, trees are in general undirected which in theory means we would have to worry about revisiting a node that we just came from. So why wasn&rsquo;t this the case?</p>
+<p>Well it has to do with how (rooted) trees are often implemented. When they are defined as a collection of nodes, each of which can only point to child nodes, then that naturally influences how a traversal will progress (this implementation choice makes a tree &ldquo;feel&rdquo; like it is directed). Specifically DFS or BFS can only explore nodes down the tree (and never up) and as a result there is no way to visit an already visited node.</p>
+<p>If on the other hand, our rooted tree was implemented with an adjacency list (bi-directional edges) then we would have to worry about visiting already visited nodes (like where we came from during DFS) and thus we would need to maintain a visited set.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>BFS and DFS are two fundamental algorithms that are commonly applied to trees and graphs. In the general case we need to maintain a visited set in order to avoid pitfalls like revisiting already processed nodes and getting stuck in a cycle. Sometimes trees allow for simpler incarnations of BFS and DFS that don&rsquo;t require a visited set. Lastly, when detecting a cycle the approach varies between undirected and directed graphs.</p>
+
+</content>
+<p>
+  
+</p>
+
+  </main>
+  <footer><small>
+  Copyright &copy; 2025 Mikhail Breslav 
+</small></footer>
+
+    
+</body>
+
+</html>

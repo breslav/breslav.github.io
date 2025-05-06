@@ -7,8 +7,15 @@
     <generator>Hugo</generator>
     <language>en-US</language>
     <copyright>Copyright © 2025, Mikhail Breslav.....</copyright>
-    <lastBuildDate>Fri, 25 Apr 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 05 May 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://breslav.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Graph Traversals (Briefly)</title>
+      <link>https://breslav.github.io/graph-traversals-briefly/</link>
+      <pubDate>Mon, 05 May 2025 00:00:00 +0000</pubDate>
+      <guid>https://breslav.github.io/graph-traversals-briefly/</guid>
+      <description>&lt;p&gt;When it comes to graphs, traversal algorithms like BFS and DFS are among the most important algorithms to know and work with. However, the implementation of BFS and DFS can be a bit nuanced with respect to the type of graph we are working with. In this blog post I want to briefly summarize some of these nuances.&lt;/p&gt;&#xA;&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;&#xA;&lt;p&gt;In general we can have undirected and directed graphs, which consist of one or more connected components (&lt;strong&gt;CC&lt;/strong&gt;), which can be acyclic or cyclic. The table below lists the different types of graphs that I want to look at in this post.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Dropout (Briefly)</title>
       <link>https://breslav.github.io/dropout-briefly/</link>
